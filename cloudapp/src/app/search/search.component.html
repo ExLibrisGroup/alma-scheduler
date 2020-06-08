@@ -1,0 +1,29 @@
+<div>
+  <mat-form-field class="full-width">
+    <mat-label>Search by User</mat-label>
+    <input type="text" placeholder="Type to search..." aria-label="Select a user" matInput [formControl]="userSearch" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUser" panelWidth="500px">
+      <mat-option *ngIf="searching" class="is-loading"><mat-spinner diameter="20"></mat-spinner></mat-option>
+      <ng-container *ngIf="!searching">
+        <mat-option *ngFor="let user of users" [value]="user" (onSelectionChange)="search($event.source.value)">
+          {{user.first_name}} {{user.last_name}} ({{user.primary_id}})
+        </mat-option>      
+      </ng-container>
+    </mat-autocomplete>
+  </mat-form-field>  
+</div>
+<mat-spinner diameter="30" class="spinner" *ngIf="loading"></mat-spinner>
+<div *ngIf="events">
+  <mat-list role="list" *ngIf="events.length>0; else noevents">
+    <mat-list-item role="listitem" *ngFor="let event of events">
+      {{event.startTime}} / {{event.location}} 
+      <button mat-icon-button (click)="edit(event.id)">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+  <ng-template #noevents>
+    No events found.
+  </ng-template>
+</div>
+

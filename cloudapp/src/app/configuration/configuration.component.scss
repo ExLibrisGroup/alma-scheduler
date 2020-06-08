@@ -1,0 +1,39 @@
+mat-tab-body {
+  margin-top: 10px;
+}
+
+mat-tab-group {
+  margin-bottom: 25px;
+}
+
+mat-form-field.full-width {
+  width: 90%;
+  max-width: 400px;
+  display: block!important;
+}
+
+mat-form-field {
+  margin-right: 20px;
+}
+
+mat-card {
+  max-width: 500px;
+  margin: 20px 0;
+}
+
+mat-card-title button {
+  float: right;
+}
+
+span.color-sample {
+  margin-right: 10px;
+  padding: 2px 10px;
+  border: solid 2px;
+  height: 15px;
+  display: inline-flex;
+  align-items: center;
+}
+
+input[readonly], textarea[readonly] {
+  color: rgba(0,0,0,.38);
+ }

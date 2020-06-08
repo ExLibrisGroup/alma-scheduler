@@ -1,0 +1,56 @@
+<h3>Alma Scheduler Event</h3>
+<form *ngIf="form" [formGroup]="form"> 
+  <!--
+  <mat-form-field>
+    <mat-label>Date</mat-label>
+    <input matInput [matDatepicker]="picker">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field> 
+-->
+  <mat-form-field>
+    <input matInput [ngxMatDatetimePicker]="picker" placeholder="Start time" formControlName="startTime">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <ngx-mat-datetime-picker #picker [showSpinners]="true" [showSeconds]="false"
+      [stepMinute]="5" color="primary" [enableMeridian]="false">
+    </ngx-mat-datetime-picker>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Location</mat-label>
+    <mat-select formControlName="location">
+      <mat-option *ngFor="let location of configuration.locations" [value]="location.id">{{location.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>   
+  <mat-form-field>
+    <mat-label>Duration</mat-label>
+    <mat-select (selectionChange)="changeDuration($event.value)" formControlName="duration">
+      <mat-option *ngFor="let min of [5,10,15,20,30]" [value]="min">{{min}} minutes</mat-option>
+    </mat-select>
+  </mat-form-field> 
+  <mat-form-field>
+    <mat-label>User</mat-label>
+    <input type="text" placeholder="Type to search..." aria-label="Select a user" matInput [formControl]="userSearch" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUser" panelWidth="500px">
+      <mat-option *ngIf="searching" class="is-loading"><mat-spinner diameter="20"></mat-spinner></mat-option>
+      <ng-container *ngIf="!searching">
+        <mat-option *ngFor="let user of users" [value]="user" (onSelectionChange)="setUser($event.source.value)">
+          {{user.first_name}} {{user.last_name}} ({{user.primary_id}})
+        </mat-option>      
+      </ng-container>
+    </mat-autocomplete>
+    <mat-error *ngIf="form.controls.userId.invalid">User is required</mat-error>
+  </mat-form-field>         
+  <!--<mat-checkbox [value]="sendNotification" labelPosition="before">Notify user</mat-checkbox>-->
+  <div class="commands-container">
+    <button mat-stroked-button type="button" color="primary" (click)="save()" [disabled]="!form.valid">Save</button>
+    <button mat-stroked-button type="button" (click)="delete()" [disabled]="!form.value.id">Delete</button>
+    <button mat-stroked-button [routerLink]="['/scheduler']">Cancel</button>
+    <mat-spinner diameter="30" class="spinner" *ngIf="loading"></mat-spinner>
+  </div>
+  <!--
+  <pre>
+    {{form.value | json}}
+    {{form.valid}}
+  </pre>
+-->
+</form>

@@ -1,0 +1,18 @@
+{
+  "name": "my-exl-cloudapp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "eca start"
+  },
+  "dependencies": {
+    "@angular-material-components/datetime-picker": "^2.0.4",
+    "@angular-material-components/moment-adapter": "^2.0.2",
+    "@angular/material-moment-adapter": "^9.2.4",
+    "@exlibris/exl-cloudapp-base": "^0.1.20",
+    "@fortawesome/fontawesome-free": "^5.13.0",
+    "angular-calendar": "^0.28.15",
+    "moment": "^2.26.0",
+    "uuid": "^8.1.0"
+  }
+}

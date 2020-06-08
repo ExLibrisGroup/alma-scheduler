@@ -1,0 +1,53 @@
+<div *ngIf="config">
+  <div class="commands-container">
+    <button type="button"
+      mat-stroked-button
+      color="primary"
+      mwlCalendarPreviousView
+      [view]="'day'"
+      [(viewDate)]="viewDate"
+      >Previous</button>
+    <button type="button"
+      mat-stroked-button
+      mwlCalendarToday
+      [(viewDate)]="viewDate"
+      >Today</button>
+    <button type="button"
+      mat-stroked-button
+      color="primary"
+      mwlCalendarNextView
+      [view]="'day'"
+      [(viewDate)]="viewDate"
+      >Next</button>
+    <mat-spinner diameter="30" class="spinner" *ngIf="loading"></mat-spinner>
+  </div>
+  <!--<h3>{{ viewDate | calendarDate:('dayViewTitle') }}</h3>-->
+  <mat-form-field>
+    <mat-label></mat-label>
+    <input matInput [matDatepicker]="picker" [(ngModel)]="viewDate">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <mat-form-field class="full-width">
+    <mat-label>Locations</mat-label>
+    <mat-select [formControl]="locationSelect" multiple>
+      <mat-option *ngFor="let location of config.locations" [value]="location.id">{{location.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>  
+  
+  <mwl-day-view-scheduler #dayView
+    [viewDate]="viewDate"
+    [events]="events"
+    [users]="locations"
+    [refresh]="refresh"
+    [dayStartHour]="config.startHour"
+    [dayEndHour]="config.endHour"
+    [hourSegments]="60/config.duration"
+    (eventTimesChanged)="eventTimesChanged($event)"
+    (eventClicked)="eventClicked($event)"
+    (userChanged)="userChanged($event)"
+    (hourSegmentClicked)="hourClicked($event)"
+  >
+  </mwl-day-view-scheduler>
+</div>
+

@@ -1,0 +1,26 @@
+{
+   "id": "jweisman/alma-scheduler",
+   "title": "Event Scheduler",
+   "description": "Define locations and schedule events for Alma users. Configuration supports hours and duration and multiple locations with capacity. Sends email to users when events are created.",
+   "author": "Josh Weisman",
+   "subtitle": "Scheduling interface for users at defined locations",
+   "icon": {
+      "type": "font",
+      "value": "fa fa-calendar"
+   },
+   "fullscreen": {
+      "allow": true,
+      "open": false
+   },
+   "pages": {
+      "config": "/#/configuration"
+   },
+   "contentSecurity": {
+      "connectSrc": [
+         "https://api-eu.exldevnetwork.net"
+      ],
+      "sandbox": {
+         "modals": true
+      }
+   }
+}

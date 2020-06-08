@@ -1,0 +1,39 @@
+
+@import './app/main/main.component.theme';
+
+@mixin themed-styles($theme, $typography) {
+    /* Include themed component mixins or theme dependent styles here */
+    @include main-component-theme($theme, $typography);
+}
+
+@mixin global-styles {
+    /* Add global styles here */
+    body {
+        margin-top: 10px!important;
+    }
+
+    .commands-container {
+        margin-top: 10px;
+        width: fit-content;
+    }
+    
+    .spinner {
+        float: right;
+    }
+    
+    .commands-container button {
+        margin-right: 10px;
+    }    
+
+    div.title {
+        display: flex;
+        margin-top: 10px;
+    }
+      
+      div.title a {
+        margin-left: auto;
+    }
+}
+
+@import "../../node_modules/angular-calendar/css/angular-calendar.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
