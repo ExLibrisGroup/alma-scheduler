@@ -1,19 +1,19 @@
 
 import { Injectable } from '@angular/core';
-import { InitService, CloudAppConfigService, InitData } from '@exlibris/exl-cloudapp-angular-lib';
-import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { Configuration } from './models/configuration';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
-  private _config: Configuration;
 
-  constructor(
-    private configService: CloudAppConfigService
-  ) {  }
+  constructor() {  }
+
+  /*
+  async load() {
+    console.log('in load- before');
+    this._config = await this.configService.get().toPromise();
+    console.log('in load- after');
+  }
 
   get config(): Observable<Configuration> {
     if (this._config) {
@@ -43,4 +43,5 @@ export class AppService {
       map(()=>true)
     );
   }
+  */
 }

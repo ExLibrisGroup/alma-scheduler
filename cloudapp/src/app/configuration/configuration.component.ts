@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewEncapsulation, Injectable } from '@angular/core';
 import { CanDeactivate } from "@angular/router";
-import { AppService } from '../app.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormArray } from '@angular/forms';
 import { configFormGroup, locationFormGroup, Colors } from '../models/configuration';
+import { ConfigurationService } from '../models/configuration.service';
 
 @Component({
   selector: 'app-configuration',
@@ -17,23 +17,21 @@ export class ConfigurationComponent implements OnInit {
   saving = false;
 
   constructor(
-    private appService: AppService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private configurationService: ConfigurationService
   ) { }
 
   ngOnInit() {
     this.load();
   }
 
-  load() {
-    this.appService.config.subscribe(config=>{
-      this.form = configFormGroup(config);
-    });
+  async load() {
+   this.form = configFormGroup(await this.configurationService.getConfig());
   }
 
   save() {
     this.saving = true;
-    this.appService.setConfig(this.form.value).subscribe(
+    this.configurationService.setConfig(this.form.value).subscribe(
       () => {
         this.toastr.success('Settings successfully saved.');
         this.form.markAsPristine();
@@ -43,10 +41,10 @@ export class ConfigurationComponent implements OnInit {
     );
   }
 
-  reset() {
-    if (confirm('Discard configuration?')) {
+  restore() {
+    if (confirm('Discard configuration and restore default?')) {
       this.saving = true;
-      this.appService.removeConfig().subscribe({
+      this.configurationService.removeConfig().subscribe({
         complete: () => {
           this.saving = false;
           this.load();
@@ -59,10 +57,12 @@ export class ConfigurationComponent implements OnInit {
     let location = locationFormGroup();
     location.patchValue({name: `Location #${this.locations.length+1}`});
     this.locations.push(location);
+    this.form.markAsDirty();
   }
 
   deleteLocation(i) {
     this.locations.removeAt(i);
+    this.form.markAsDirty();
   }
 
   get notification() {

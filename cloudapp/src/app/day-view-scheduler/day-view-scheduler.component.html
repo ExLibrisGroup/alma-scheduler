@@ -229,10 +229,9 @@
             [locale]="locale"
             [customTemplate]="hourSegmentTemplate"
             (dblclick)="
-              hourSegmentClicked.emit({
+            hourSegmentDblClicked.emit({
                 date: segment.date,
-                column: columnIndex,
-                sourceEvent: $event
+                column: columnIndex
               })
             "
             

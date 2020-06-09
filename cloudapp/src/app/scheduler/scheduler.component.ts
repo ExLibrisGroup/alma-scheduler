@@ -1,17 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { map, finalize, tap, switchMap } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { ToastrService } from 'ngx-toastr';
-import { HttpClient } from '@angular/common/http';
 import moment from 'moment';
 import { User } from '../day-view-scheduler/day-view-scheduler.component';
-import { AlmaSchedulerEventUtils } from '../models/event';
+import { EventUtilsService } from '../models/event-utils.service';
 import { Configuration } from '../models/configuration';
-import { CloudAppStoreService, CloudAppEventsService } from '@exlibris/exl-cloudapp-angular-lib';
-import { AppService } from '../app.service';
+import { CloudAppStoreService } from '@exlibris/exl-cloudapp-angular-lib';
+import { ConfigurationService } from '../models/configuration.service';
 
 const LOCATIONS_STORE = 'locations';
 
@@ -21,7 +20,6 @@ const LOCATIONS_STORE = 'locations';
   styleUrls: ['./scheduler.component.scss'],
 })
 export class SchedulerComponent implements OnInit {
-  private eventUtils: AlmaSchedulerEventUtils;
   private _viewDate: moment.Moment;
   events: CalendarEvent[] = [];
   loading = false;
@@ -32,27 +30,26 @@ export class SchedulerComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private http: HttpClient,
     private toastr: ToastrService,
-    private appService: AppService,
     private storeService: CloudAppStoreService,
-    private eventsService: CloudAppEventsService
+    private configurationService: ConfigurationService,
+    private eventUtils: EventUtilsService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.locationSelect.valueChanges.subscribe(this.selectLocations);
-    this.getConfig().pipe(
-      switchMap(() => this.storeService.get(LOCATIONS_STORE)),
-      tap(val=>this.locationSelect.setValue(val))
-    )
-    .subscribe(val=>this.selectLocations(val));
+    this.eventUtils = await this.eventUtils.init();
+    this.config = await this.configurationService.getConfig();
+    this.storeService.get(LOCATIONS_STORE).subscribe(val=>{
+      this.locationSelect.setValue(val);
+      this.selectLocations(val);
+    });
   }
 
   getEvents() {
     this.loading = true;
-    this.getConfig().pipe(
+    this.eventUtils.getEvents({date: this.viewDate}).pipe(
       finalize(()=>this.loading=false),
-      switchMap(() => this.eventUtils.getEvents({date: this.viewDate})),
       map( events => 
         events.filter(event=>this.config.locations.some(l=>l.id==event.location))
         .map(event=>this.eventUtils.toCalendarEvent(event, this.config.locations.find(location=>location.id==event.location)))
@@ -68,9 +65,11 @@ export class SchedulerComponent implements OnInit {
   }
 
   selectLocations = (val: string[]) => {
-    this.storeService.set(LOCATIONS_STORE, val).subscribe();
-    this.locations = this.config.locations.filter(l=>val.includes(l.id));
-    this.refresh.next();
+    if (val) {
+      this.storeService.set(LOCATIONS_STORE, val).subscribe();
+      this.locations = this.config.locations.filter(l=>val.includes(l.id));
+      this.refresh.next();
+    }
   }
 
   eventTimesChanged({event, newStart, newEnd }: CalendarEventTimesChangedEvent): void {
@@ -90,6 +89,21 @@ export class SchedulerComponent implements OnInit {
   }
 
   hourClicked(event): void {
+    /* Check capacity */
+    const [overlap, capacity] = this.checkCapacity(event);
+    if (overlap >= capacity) {
+      this.toastr.warning('Slot is filled to capacity');
+      return;
+    }
+
+    this.router.navigate(['event/new', 
+      { date: event.date, 
+        location: this.locations[event.column].id,
+        duration: this.config.duration
+      }])
+  }
+
+  private checkCapacity = (event: any): [number, number] => {
     const startTime = event.date, endTime = moment(event.date).add(this.config.duration, 'minutes');
     const overlap = 
       this.events.filter(e=>
@@ -99,15 +113,7 @@ export class SchedulerComponent implements OnInit {
           moment(e.end).isBetween(startTime, endTime, undefined, '(]')  )
       ).length;
     const capacity = this.config.locations.find(l=>l.id==this.locations[event.column].id).capacity;
-    if (overlap >= capacity) {
-      this.toastr.warning('Slot is filled to capacity');
-      return;
-    }
-    this.router.navigate(['event/new', 
-      { date: event.date, 
-        location: this.locations[event.column].id,
-        duration: this.config.duration
-      }])
+    return [overlap, capacity];
   }
 
   set viewDate(val: moment.Moment) {
@@ -122,13 +128,4 @@ export class SchedulerComponent implements OnInit {
     if (!this._viewDate) this.viewDate = moment();
     return this._viewDate;
   }
-
-  getConfig() {
-    return this.eventsService.getInitData().pipe(
-      tap(data=>this.eventUtils = new AlmaSchedulerEventUtils(this.http, data['instCode']||'test')),
-      switchMap(()=>this.appService.config),
-      tap(config => this.config = config)
-    )
-  }
-
 }

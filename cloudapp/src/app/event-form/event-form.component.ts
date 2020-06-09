@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { CloudAppRestService, CloudAppEventsService } from '@exlibris/exl-cloudapp-angular-lib';
-import { forkJoin } from 'rxjs';
+import { CloudAppRestService } from '@exlibris/exl-cloudapp-angular-lib';
 import { debounceTime, tap, switchMap, finalize, filter, map } from 'rxjs/operators';
-import { AlmaSchedulerEventUtils } from '../models/event';
+import { EventUtilsService } from '../models/event-utils.service';
 import moment from 'moment';
-import { AppService } from '../app.service';
 import { Configuration } from '../models/configuration';
+import { ConfigurationService } from '../models/configuration.service';
 
 @Component({
   selector: 'app-event-form',
@@ -17,8 +15,7 @@ import { Configuration } from '../models/configuration';
   styleUrls: ['./event-form.component.scss']
 })
 export class EventFormComponent implements OnInit {
-  private eventUtils: AlmaSchedulerEventUtils;
-  configuration: Configuration;
+  config: Configuration;
   form: FormGroup;
   sendNotification = true;
   loading = false;
@@ -27,33 +24,29 @@ export class EventFormComponent implements OnInit {
   userSearch = new FormControl();
 
   constructor(
-    private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
     private restService: CloudAppRestService,
-    private eventsService: CloudAppEventsService,
-    private appService: AppService
+    private configurationService: ConfigurationService,
+    private eventUtils: EventUtilsService
   ) { }
 
-  ngOnInit() {
-    this.appService.config.pipe(
-      tap(config=>this.configuration = config),
-      switchMap(() => this.eventsService.getInitData())
-    )
-    .subscribe(data=>{
-      this.eventUtils = new AlmaSchedulerEventUtils(this.http, data['instCode']||'test');
-      if (this.route.snapshot.params.id) {
-        this.get(this.route.snapshot.params);
-      } else {
-        this.form = this.eventUtils.eventFormGroup();
-        this.form.patchValue({
-          startTime: moment(this.route.snapshot.params['date']),
-          location: this.route.snapshot.params['location'],
-          duration: +this.route.snapshot.params['duration']
-        });
-      }
-    });
+  async ngOnInit() {
+    this.eventUtils = await this.eventUtils.init();
+    this.config = await this.configurationService.getConfig();
+  
+    if (this.route.snapshot.params.id) {
+      this.get(this.route.snapshot.params);
+    } else {
+      this.form = this.eventUtils.eventFormGroup();
+      this.form.patchValue({
+        startTime: moment(this.route.snapshot.params['date']),
+        location: this.route.snapshot.params['location'],
+        duration: +this.route.snapshot.params['duration']
+      });
+    }
+
     this.userSearch.valueChanges
       .pipe(
         debounceTime(300),
@@ -87,8 +80,8 @@ export class EventFormComponent implements OnInit {
     this.eventUtils.saveEvent(this.form.value)
     .pipe(
       finalize(()=>this.loading = false),
-      switchMap(()=>forkJoin(this.appService.config, this.restService.call(`/users/${this.form.value.userId}`))),
-      switchMap(([config, user])=>this.eventUtils.sendNotification(this.form.value, config, user)),
+      switchMap(()=>this.restService.call(`/users/${this.form.value.userId}`)),
+      switchMap(user=>this.eventUtils.sendNotification(this.form.value, user)),
     )
     .subscribe( 
       () => this.toastr.success('Event saved'),
@@ -116,7 +109,6 @@ export class EventFormComponent implements OnInit {
   setUser(val) {
     this.form.patchValue({userId: val.primary_id, title: this.displayUser(val)})
   }
-
 }
 
 

@@ -6,9 +6,10 @@ import { debounceTime, filter, tap, switchMap, finalize, map } from 'rxjs/operat
 import { CloudAppRestService, CloudAppEventsService } from '@exlibris/exl-cloudapp-angular-lib';
 import { AppService } from '../app.service';
 import { ToastrService } from 'ngx-toastr';
-import { AlmaSchedulerEventUtils, AlmaSchedulerEvent } from '../models/event';
+import { EventUtilsService } from '../models/event-utils.service';
 import { Configuration } from '../models/configuration';
 import moment from 'moment';
+import { ConfigurationService } from '../models/configuration.service';
 
 @Component({
   selector: 'app-search',
@@ -16,7 +17,6 @@ import moment from 'moment';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit {
-  private eventUtils: AlmaSchedulerEventUtils
   userSearch = new FormControl('');
   searching = false;
   users: any[];
@@ -26,24 +26,27 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private restService: CloudAppRestService,
-    private eventsService: CloudAppEventsService,
-    private appService: AppService,
     private toastr: ToastrService,
-    private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private configurationService: ConfigurationService,
+    private eventUtils: EventUtilsService
   ) { }
 
-  ngOnInit() {
-  this.userSearch.valueChanges
-  .pipe(
-    debounceTime(300),
-    filter(value => typeof value === 'string' && value.length >= 3),
-    tap(() => this.searching = true),
-    switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(' ','_')}`)
-      .pipe(finalize(() => this.searching = false))
-    ),
-  )
-  .subscribe( users => this.users = users.user); 
+  async ngOnInit() {
+    const initData = await this.configurationService.getInitData();
+    this.eventUtils = await this.eventUtils.init();
+    this.config = await this.configurationService.getConfig();
+
+    this.userSearch.valueChanges
+    .pipe(
+      debounceTime(300),
+      filter(value => typeof value === 'string' && value.length >= 3),
+      tap(() => this.searching = true),
+      switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(' ','_')}`)
+        .pipe(finalize(() => this.searching = false))
+      ),
+    )
+    .subscribe( users => this.users = users.user); 
   }
 
   displayUser(user) {
@@ -51,11 +54,9 @@ export class SearchComponent implements OnInit {
   }
 
   search(val) {
-    console.log('search', val);
     this.loading = true;
-    this.getConfig().pipe(
+    this.eventUtils.getEvents({userId: val.primary_id}).pipe(
       finalize(()=>this.loading=false),
-      switchMap(() => this.eventUtils.getEvents({userId: val.primary_id})),
       map( events => 
         events.filter(event=>this.config.locations.some(l=>l.id==event.location))
         .map(event=>({
@@ -77,13 +78,4 @@ export class SearchComponent implements OnInit {
   edit(id) {
     this.router.navigate(['event', id])
   }
-
-  getConfig() {
-    return this.eventsService.getInitData().pipe(
-      tap(data=>this.eventUtils = new AlmaSchedulerEventUtils(this.http, data['instCode']||'test')),
-      switchMap(()=>this.appService.config),
-      tap(config => this.config = config)
-    )
-  }
-
 }

@@ -9,7 +9,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/moment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxMatDatetimePickerModule, NgxMatTimepickerModule } from '@angular-material-components/datetime-picker';
 import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
-import { MomentDateModule, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MomentDateModule } from '@angular/material-moment-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import moment from 'moment';
 
@@ -22,6 +22,8 @@ import { EventFormComponent } from './event-form/event-form.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { SearchComponent } from './search/search.component';
 import { NoConfigComponent } from './main/no-config.component';
+import { ConfigurationService } from './models/configuration.service';
+import { EventUtilsService } from './models/event-utils.service';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -82,7 +84,9 @@ export function getCalendarModule() {
           monthYearA11yLabel: 'MMMM YYYY',
         }
       }
-    } 
+    },
+    ConfigurationService,
+    EventUtilsService
   ],
   bootstrap: [AppComponent]
 })

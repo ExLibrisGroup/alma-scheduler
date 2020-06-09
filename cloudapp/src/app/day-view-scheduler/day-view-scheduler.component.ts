@@ -89,6 +89,10 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent
   @Input() users: User[] = [];
 
   @Output() userChanged = new EventEmitter();
+  @Output() hourSegmentDblClicked = new EventEmitter<{
+    date: Date;
+    column: number;
+  }>();
 
   view: DayViewScheduler;
 

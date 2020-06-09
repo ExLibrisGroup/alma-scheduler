@@ -1,4 +1,5 @@
 const utils = require('./utils');
+const { auth } = require('./authorizer/index');
 require('dotenv').config();
 const MONGODB_URI = process.env.MONGODB_URI; 
 const MongoClient = require('mongodb').MongoClient;
@@ -10,7 +11,6 @@ let client = null;
 let collection;
 
 const handler = async (event, context) => {
-  console.log('event: ', event);
   let result;
   context.callbackWaitsForEmptyEventLoop = false;
   const body = JSON.parse(event.body||'{}');
@@ -18,6 +18,13 @@ const handler = async (event, context) => {
     result = { statusCode: 204 };
     return utils.cors(result, event);
   }
+  /* Validate token */
+  const token = auth(event.headers.authorization);
+  if (!token) {
+    result = utils.responses.unauthorized();
+    return utils.cors(result, event);
+  }
+
   try {
     await connect(MONGODB_URI);
     if (event.pathParameters && event.pathParameters.instCode)
