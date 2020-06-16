@@ -1,2 +1,2 @@
-# Alma Event Scheduler
-Event scheduler app for Ex Libris Alma
+# Alma Appointment Scheduler
+Appointment scheduler Cloud App for Ex Libris Alma. See [here](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/) for more info.
