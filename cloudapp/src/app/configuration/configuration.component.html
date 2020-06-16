@@ -87,7 +87,7 @@
   <div class="commands-container">
     <button mat-stroked-button type="button" color="primary" (click)="save()">Save</button>
     <button mat-stroked-button type="button" (click)="load()">Reset</button>
-    <button mat-stroked-button type="button" [routerLink]="['']">Cancel</button> 
+    <button mat-stroked-button type="button" [routerLink]="['/']">Cancel</button> 
     <button mat-stroked-button type="button" (click)="restore()">Restore</button> 
     <mat-spinner diameter="30" class="spinner" *ngIf="saving"></mat-spinner>
   </div>

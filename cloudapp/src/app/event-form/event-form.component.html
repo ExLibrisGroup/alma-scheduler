@@ -1,13 +1,5 @@
-<h3>Alma Scheduler Event</h3>
+<h3>Schedule Appointment</h3>
 <form *ngIf="form" [formGroup]="form"> 
-  <!--
-  <mat-form-field>
-    <mat-label>Date</mat-label>
-    <input matInput [matDatepicker]="picker">
-    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field> 
--->
   <mat-form-field>
     <input matInput [ngxMatDatetimePicker]="picker" placeholder="Start time" formControlName="startTime">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -40,17 +32,10 @@
     </mat-autocomplete>
     <mat-error *ngIf="form.controls.userId.invalid">User is required</mat-error>
   </mat-form-field>         
-  <!--<mat-checkbox [value]="sendNotification" labelPosition="before">Notify user</mat-checkbox>-->
   <div class="commands-container">
     <button mat-stroked-button type="button" color="primary" (click)="save()" [disabled]="!form.valid">Save</button>
     <button mat-stroked-button type="button" (click)="delete()" [disabled]="!form.value.id">Delete</button>
-    <button mat-stroked-button [routerLink]="['/scheduler']">Cancel</button>
+    <button mat-stroked-button [routerLink]="['/']">Cancel</button>
     <mat-spinner diameter="30" class="spinner" *ngIf="loading"></mat-spinner>
   </div>
-  <!--
-  <pre>
-    {{form.value | json}}
-    {{form.valid}}
-  </pre>
--->
 </form>

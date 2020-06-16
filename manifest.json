@@ -1,9 +1,9 @@
 {
    "id": "jweisman/alma-scheduler",
-   "title": "Event Scheduler",
-   "description": "Define locations and schedule events for Alma users. Configuration supports hours and duration and multiple locations with capacity. Sends email to users when events are created. Note: This app is currently available in beta form.",
+   "title": "Appointment Scheduler",
+   "description": "Define locations and schedule appointments for Alma users. Configuration supports hours and duration and multiple locations with capacity. Sends email to users when events are created. Note: This app is currently available in beta form.",
    "author": "Josh Weisman",
-   "subtitle": "Scheduling interface for users at defined locations",
+   "subtitle": "Schedule appointments for users at defined locations",
    "license": "https://raw.githubusercontent.com/jweisman/alma-scheduler/master/LICENSE",
    "icon": {
       "type": "font",

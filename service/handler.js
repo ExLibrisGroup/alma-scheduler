@@ -1,7 +1,8 @@
 const utils = require('./utils');
 const { auth } = require('./authorizer/index');
 require('dotenv').config();
-const MONGODB_URI = process.env.MONGODB_URI; 
+const MONGODB_URI = process.env.MONGODB_URI;
+const validateInstCode = process.env.VALIDATE_INST_CODE != 'false';
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
 const AWS = require('aws-sdk');
@@ -14,21 +15,22 @@ const handler = async (event, context) => {
   let result;
   context.callbackWaitsForEmptyEventLoop = false;
   const body = JSON.parse(event.body||'{}');
+  const instCode = event.pathParameters && event.pathParameters.instCode;
   if (event.requestContext && event.requestContext.http.method == 'OPTIONS') {
     result = { statusCode: 204 };
     return utils.cors(result, event);
   }
   /* Validate token */
   const token = auth(event.headers.authorization);
-  if (!token) {
+  if (!token || (instCode && validateInstCode && instCode != token.instCode)) {
     result = utils.responses.unauthorized();
     return utils.cors(result, event);
   }
 
   try {
     await connect(MONGODB_URI);
-    if (event.pathParameters && event.pathParameters.instCode)
-      collection = client.collection(event.pathParameters.instCode);
+    if (instCode)
+      collection = client.collection(instCode);
     switch (event.routeKey) {
       case 'GET /events/{instCode}':
         const date = event.queryStringParameters && event.queryStringParameters.date;
