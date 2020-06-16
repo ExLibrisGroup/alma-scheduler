@@ -8,7 +8,7 @@
   "dependencies": {
     "@angular/common": "^9.1.0",
     "@angular/core": "^9.1.0",
-    "@angular/forms": "^9.1.",
+    "@angular/forms": "^9.1.0",
     "@angular/material": "^9.2.0",
     "@angular/router": "^9.1.0",
     "@exlibris/exl-cloudapp-angular-lib": "^0.1.20",
