@@ -22,7 +22,7 @@ const handler = async (event, context) => {
   }
   /* Validate token */
   const token = auth(event.headers.authorization);
-  if (!token || (instCode && validateInstCode && instCode != token.instCode)) {
+  if (!token || (instCode && validateInstCode && instCode != token.inst_code)) {
     result = utils.responses.unauthorized();
     return utils.cors(result, event);
   }
