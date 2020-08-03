@@ -26,10 +26,9 @@ export class EventUtilsService {
 
   async init() {
     const initData = await this.configurationService.getInitData();
-    this.instCode = initData['instCode']||'test';
+    this.instCode = initData['instCode'];
     this.configuration = await this.configurationService.getConfig();
-    //this.token = await this.configurationService.getToken();
-    this.token = 'eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJFeGxDbG91ZEFwcCIsInN1YiI6ImV4bF9pbXBsIiwiaW5zdF9jb2RlIjoiRVhMREVWMV9JTlNUIiwidXJscyI6eyJhbG1hIjoiaHR0cDovL2xvY2FsaG9zdDoxODAxLyJ9LCJleHAiOjE1ODU2NzEwODR9.h_aTJZZhQk1e3ro9u--Cxdb2zJRf1JS9I5EP4rJQXfHC26p1ybGTcCZnCX4-pb1B0cYvHmZYl2K-FSFsc9WpXjpLNjE1Y8u1Ke5DZSuPOEP1O7K_jlvm7gFuypesHift06aProY8tApPAE7AJIbD2GQP-G_jdd3jWglG9bFwBMmEzBcMM6uq9AFy2QzrMnIJf_mjwpw9G95ieNz8tpmhRMBQ33ml3k66Pwhk_B3PKJnPwUTXij8LFrBnvjYJoui9WSy1zk2lIdZkoygBljNgyDjyjWhandLfMVRx2u3rDH8Oh8aNWdIIPRp5QDA_UETbGkiLttt_KQ_CH68QjTrhQQ';
+    this.token = await this.configurationService.getToken();
     this.headers = new HttpHeaders({ 'Authorization': `Bearer ${this.token}` });
     return this;
   }
