@@ -24,6 +24,7 @@ import { SearchComponent } from './search/search.component';
 import { NoConfigComponent } from './main/no-config.component';
 import { ConfigurationService } from './models/configuration.service';
 import { EventUtilsService } from './models/event-utils.service';
+import { ErrorComponent } from './main/error.component';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -52,7 +53,8 @@ export function getCalendarModule() {
       EventFormComponent,
       ConfigurationComponent,
       SearchComponent,
-      NoConfigComponent
+      NoConfigComponent,
+      ErrorComponent,
    ],
    imports: [
       MaterialModule,

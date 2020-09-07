@@ -40,9 +40,8 @@ export class ConfigurationService {
     }
     try {
       this._token = await this.eventsService.getAuthToken().toPromise();
-      console.log('token', this._token);
     } catch {
-      this._token = 'AAA';
+      this._token = '';
     }
     return this._token;
   }

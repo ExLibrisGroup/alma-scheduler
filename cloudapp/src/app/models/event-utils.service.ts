@@ -102,7 +102,6 @@ export class EventUtilsService {
     }
     try {
       const email = user.contact_info.email.find(e=>e.preferred).email_address;
-      console.log('send email to', email);
       const replyTo = notification.replyTo ? [notification.replyTo] : [];
       const body = notification.body.replace(/{{(\w*)}}/g, (match, str) => {
         switch (str) {
@@ -132,7 +131,6 @@ export class EventUtilsService {
           "ReplyToAddresses": replyTo,
           "Source": notification.from
         };
-      console.log('message', JSON.stringify(payload));
       return this.http.post(`${environment.service}/notifications`, payload, { headers: this.headers })
       .pipe(
         catchError(e=>{
