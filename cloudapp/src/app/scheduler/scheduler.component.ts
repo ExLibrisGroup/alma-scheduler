@@ -97,7 +97,7 @@ export class SchedulerComponent implements OnInit {
     }
 
     this.router.navigate(['event/new', 
-      { date: event.date, 
+      { date: moment(event.date).toISOString(), 
         location: this.locations[event.column].id,
         duration: this.config.duration
       }])

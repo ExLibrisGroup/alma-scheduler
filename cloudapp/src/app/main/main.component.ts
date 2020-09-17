@@ -61,7 +61,8 @@ export class MainGuard implements CanActivate {
           return false;
         }
         if (users.error) {
-          this.router.navigate(['/error', { msg: NO_USER_ROLE }])
+          this.router.navigate(['/error', { msg: NO_USER_ROLE }]);
+          return false;
         }
         return true;
       })

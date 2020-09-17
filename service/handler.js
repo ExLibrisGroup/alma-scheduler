@@ -78,7 +78,7 @@ const getEvent = async id => {
 }
 
 const addEvent = async body =>
-  await collection.insert(body);
+  await collection.insertOne(body);
 
 const updateEvent = async (id, body) => 
   await collection.findOneAndReplace({_id: new ObjectId(id)}, body)

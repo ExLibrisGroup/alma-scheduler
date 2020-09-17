@@ -79,13 +79,16 @@ export class EventFormComponent implements OnInit {
     this.loading = true;
     this.eventUtils.saveEvent(this.form.value)
     .pipe(
-      finalize(()=>this.loading = false),
       switchMap(()=>this.restService.call(`/users/${this.form.value.userId}`)),
       switchMap(user=>this.eventUtils.sendNotification(this.form.value, user)),
+      finalize(()=>this.loading = false),
     )
     .subscribe( 
       () => this.toastr.success('Event saved'),
-      e => this.toastr.error('An error occurred: ' + e.message),
+      e => {
+        console.error('Error saving event', e)
+        this.toastr.error('An error occurred: ' + e.message);
+      },
       () => setTimeout(() => this.router.navigate(['/']), 500)
     )
   }
