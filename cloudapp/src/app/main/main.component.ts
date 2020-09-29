@@ -1,5 +1,5 @@
 import { Subscription, Observable, forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { Router, CanActivate } from '@angular/router';
 import { Component, OnInit, OnDestroy, Injectable, ViewEncapsulation } from '@angular/core';
 import { CloudAppConfigService, CloudAppEventsService, Entity, PageInfo, CloudAppRestService } from '@exlibris/exl-cloudapp-angular-lib';
@@ -53,7 +53,10 @@ export class MainGuard implements CanActivate {
   canActivate(): Observable<boolean> {
     return forkJoin([
       this.configService.get(),
-      this.restService.call('/users?limit=1').pipe(catchError(e=>of(e)))
+      this.restService.call('/users?limit=1').pipe(
+        switchMap(users=>this.restService.call(users.user[0].link)),
+        catchError(e=>of(e))
+      )
     ]).pipe(
       map( ([config, users]) => {
         if (Object.keys(config).length==0) {

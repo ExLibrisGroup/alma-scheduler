@@ -84,7 +84,7 @@ export class EventFormComponent implements OnInit {
       finalize(()=>this.loading = false),
     )
     .subscribe( 
-      () => this.toastr.success('Event saved'),
+      success => this.toastr.success(`Event saved. Notification was ${success ? '' : 'NOT '}sent.`),
       e => {
         console.error('Error saving event', e)
         this.toastr.error('An error occurred: ' + e.message);
