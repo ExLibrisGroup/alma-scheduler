@@ -89,7 +89,7 @@ export class EventFormComponent implements OnInit {
         console.error('Error saving event', e)
         this.toastr.error('An error occurred: ' + e.message);
       },
-      () => setTimeout(() => this.router.navigate(['/']), 500)
+      () => setTimeout(() => this.router.navigate(['/main']), 500)
     )
   }
 
@@ -101,7 +101,7 @@ export class EventFormComponent implements OnInit {
     .subscribe(
       () => this.toastr.success('Event deleted'),
       e => this.toastr.error('An error occurred: ' + e.message),
-      () => setTimeout(() => this.router.navigate(['/']), 500)
+      () => setTimeout(() => this.router.navigate(['/main']), 500)
     )
   }
 

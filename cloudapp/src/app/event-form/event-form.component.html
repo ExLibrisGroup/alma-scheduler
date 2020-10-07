@@ -35,7 +35,7 @@
   <div class="commands-container">
     <button mat-stroked-button type="button" color="primary" (click)="save()" [disabled]="!form.valid">Save</button>
     <button mat-stroked-button type="button" (click)="delete()" [disabled]="!form.value.id">Delete</button>
-    <button mat-stroked-button [routerLink]="['/']">Cancel</button>
+    <button mat-stroked-button [routerLink]="['/main']">Cancel</button>
     <mat-spinner diameter="30" class="spinner" *ngIf="loading"></mat-spinner>
   </div>
 </form>

@@ -37,38 +37,3 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
 }
-
-const NO_USER_ROLE = 'It appears you don\'t have access to user information, which is required to assign appointments. Please check with an administrator.'
-
-@Injectable({
-  providedIn: 'root',
-})
-export class MainGuard implements CanActivate {
-  constructor (
-    private configService: CloudAppConfigService,
-    private restService: CloudAppRestService,
-    private router: Router,
-  ) {}
-
-  canActivate(): Observable<boolean> {
-    return forkJoin([
-      this.configService.get(),
-      this.restService.call('/users?limit=1').pipe(
-        switchMap(users=>this.restService.call(users.user[0].link)),
-        catchError(e=>of(e))
-      )
-    ]).pipe(
-      map( ([config, users]) => {
-        if (Object.keys(config).length==0) {
-          this.router.navigate(['/noconfig']);
-          return false;
-        }
-        if (users.error) {
-          this.router.navigate(['/error', { msg: NO_USER_ROLE }]);
-          return false;
-        }
-        return true;
-      })
-    );
-  }
-}

@@ -21,10 +21,11 @@ import { SchedulerComponent } from './scheduler/scheduler.component';
 import { EventFormComponent } from './event-form/event-form.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { SearchComponent } from './search/search.component';
-import { NoConfigComponent } from './main/no-config.component';
+import { NoConfigComponent } from './splash/no-config.component';
 import { ConfigurationService } from './models/configuration.service';
 import { EventUtilsService } from './models/event-utils.service';
-import { ErrorComponent } from './main/error.component';
+import { ErrorComponent } from './splash/error.component';
+import { SplashComponent } from './splash/splash.component';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -45,7 +46,7 @@ export function getCalendarModule() {
 }
 
 @NgModule({
-   declarations: [
+   declarations: [	
       AppComponent,
       MainComponent,
       SchedulerComponent,
@@ -55,6 +56,7 @@ export function getCalendarModule() {
       SearchComponent,
       NoConfigComponent,
       ErrorComponent,
+      SplashComponent,
    ],
    imports: [
       MaterialModule,
