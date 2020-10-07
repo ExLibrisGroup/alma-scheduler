@@ -49,9 +49,12 @@ const handler = async (event, context) => {
       case 'GET /events/{instCode}/{id}':
         result = utils.responses.success(await getEvent(event.pathParameters.id));
         break;
-      case 'POST /notifications':
+      case 'POST /notifications/email':
         result = utils.responses.success(await sendNotification(body));
         break;
+      case 'POST /notifications/sms':
+        result = utils.responses.success(await sendSMSNotification(body));
+        break;  
       default:
         result = utils.responses.notfound();
     }
@@ -95,6 +98,19 @@ const sendNotification = async body => {
       )) throw new Error('Invalid email parameters');
   const params = {...body, Source: body.Source + ' <alma-scheduler@exldevnetwork.net>'};
   await new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
+}
+
+const sendSMSNotification = async body => {
+  if (!(process.env.TWILIO_ACCOUNT && process.env.TWILIO_AUTH)) {
+    throw new Error('No SMS credentials');
+  }
+  const twilio = require('twilio');
+  const client = new twilio(process.env.TWILIO_ACCOUNT, process.env.TWILIO_AUTH);
+  await client.messages.create({
+    body: body.message,
+    to: body.to,  // Text this number
+    from: body.from || process.env.TWILIO_FROM // From a valid Twilio number
+  });
 }
 
 const connect = uri => {

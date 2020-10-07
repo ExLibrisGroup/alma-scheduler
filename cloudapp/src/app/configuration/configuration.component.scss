@@ -41,3 +41,8 @@ span.color-sample {
 input[readonly], textarea[readonly] {
   color: rgba(0,0,0,.38);
  }
+
+ .mat-checkbox {
+   display: block;
+   margin-bottom: 5px;
+ }

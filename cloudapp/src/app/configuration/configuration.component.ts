@@ -78,7 +78,7 @@ export class ConfigurationComponent implements OnInit {
   }
 
   get notificationActive() {
-    return this.notification.controls.active.value;
+    return this.notification.controls.active.value || this.notification.controls.sms.value;
   }
 
 }

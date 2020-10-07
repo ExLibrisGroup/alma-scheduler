@@ -1,4 +1,4 @@
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { FormGroupUtil } from '@exlibris/exl-cloudapp-angular-lib';
 import * as uuid from 'uuid';
 
@@ -12,6 +12,8 @@ export class Configuration {
 
 export class Notification {
   active: boolean = true;
+  sms: boolean = false;
+  countryCode: string = null;
   subject: string = 'Your library appointment';
   body: string = "Hi there!\n\nWe're happy to let you know that your appointment at the library has been set for {{startTime}}.\n\nLooking forward to seeing you at {{location}}.\n\n-The library staff";
   replyTo: string = '';
@@ -31,7 +33,15 @@ export interface Color {
 }
 
 export const configFormGroup = (configuration: Configuration): FormGroup => {
-  return FormGroupUtil.toFormGroup(configuration)
+  let form = FormGroupUtil.toFormGroup(configuration);
+  /* Migrate old config */
+  if (form.get('notification.sms') == null) {
+    (form.get('notification') as FormGroup).addControl('sms', new FormControl(false));
+  }
+  if (form.get('notification.countryCode') == null) {
+    (form.get('notification') as FormGroup).addControl('countryCode', new FormControl(null));
+  }
+  return form;
 }
 
 export const locationFormGroup = (location: Location = null): FormGroup => {

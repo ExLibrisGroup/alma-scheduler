@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, ɵangular_packages_common_http_http_e } from '@angular/common/http';
 import moment from 'moment';
-import { Observable, iif, of } from 'rxjs';
+import { Observable, iif, of, forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { CalendarEvent } from 'angular-calendar';
@@ -91,28 +91,27 @@ export class EventUtilsService {
     }))
 
   sendNotification = (event: AlmaSchedulerEvent, user: any): Observable<boolean> => {
+    let requests = [];
     const notification = this.configuration.notification;
-    if (!(  notification.active && 
+    const body = notification.body.replace(/{{(\w*)}}/g, (match, str) => {
+      switch (str) {
+        case 'startTime':
+          return moment(event.startTime).format("dddd, MMMM Do YYYY, hh:mm");
+        case 'location':
+          return this.configuration.locations.find(l=>l.id==event.location).name;
+        default:
+          return '';
+      }
+    })
+    /* Email */
+    if ((  notification.active && 
             user.contact_info && 
             user.contact_info.email && 
             user.contact_info.email.length>0 && 
             user.contact_info.email.some(e=>e.preferred))
-      ) {
-      return of(false);
-    }
-    try {
+    ) {
       const email = user.contact_info.email.find(e=>e.preferred).email_address;
       const replyTo = notification.replyTo ? [notification.replyTo] : [];
-      const body = notification.body.replace(/{{(\w*)}}/g, (match, str) => {
-        switch (str) {
-          case 'startTime':
-            return moment(event.startTime).format("dddd, MMMM Do YYYY, hh:mm");
-          case 'location':
-            return this.configuration.locations.find(l=>l.id==event.location).name;
-          default:
-            return '';
-        }
-      })
       let payload = {
         "Destination": {
           "ToAddresses": [email]},
@@ -131,13 +130,38 @@ export class EventUtilsService {
           "ReplyToAddresses": replyTo,
           "Source": notification.from
         };
-      return this.http.post(`${environment.service}/notifications`, payload, { headers: this.headers })
+      requests.push(this.http.post(`${environment.service}/notifications/email`, payload, { headers: this.headers }))
+    }
+    /* SMS */
+    if ((  notification.sms && 
+      user.contact_info && 
+      user.contact_info.phone && 
+      user.contact_info.phone.length>0 && 
+      user.contact_info.phone.some(e=>e.preferred))
+    ) {
+      let phone: string = user.contact_info.phone.find(p=>p.preferred).phone_number;
+      if (!phone.startsWith('+')) {
+        phone = phone.startsWith(notification.countryCode)
+          ? '+' + phone
+          : '+' + notification.countryCode + phone;
+      }
+      let payload = {
+        message: body,
+        to: phone
+      }
+      requests.push(this.http.post(`${environment.service}/notifications/sms`, payload, { headers: this.headers }))
+    }
+    try {
+      return iif(()=>requests.length==0,
+      of(false), 
+      forkJoin(requests)
       .pipe(
         catchError(e=>{
           console.error('Error trying to send notification', e.error);
           return of(false)
         }),
-        map(()=>true));
+        map(()=>true))
+      );
     } catch(e) {
       console.error('Error trying to send notification', e);
       return of(false);

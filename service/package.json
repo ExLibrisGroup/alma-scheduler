@@ -1,7 +1,8 @@
 {
   "dependencies": {
+    "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.8",
-    "dotenv": "^8.2.0"
+    "twilio": "^3.49.4"
   }
 }
