@@ -1,16 +1,13 @@
-<div>
-  <h2 translate>Configuration</h2>
   <div class="cloudapp-actions">
     <button mat-flat-button color="secondary" [routerLink]="['/main']">
       <mat-icon>arrow_back</mat-icon>
       Back
     </button>
-    <!--<button mat-flat-button type="button" color="secondary" (click)="load()">Reset</button>-->
     <button mat-flat-button type="button" color="secondary" (click)="restore()">Restore</button> 
     <button mat-flat-button type="button" color="secondary" [routerLink]="['/main']">Cancel</button> 
     <button mat-flat-button type="button" color="primary" (click)="save()">Save</button>
-  </div>
-</div>
+  </div>  
+  <h2 translate>Configuration</h2>
 <div class="loading-shade" *ngIf="saving">
   <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
@@ -65,6 +62,10 @@
         <input matInput type="text" [formControl]="notification.controls.replyTo" [readonly]="!notificationActive">
       </mat-form-field>            
       <mat-form-field appearance="standard" class="full-width">
+        <mat-label>Date Format (language code)</mat-label>
+        <input matInput type="text" [formControl]="notification.controls.dateFormat" [readonly]="!notificationActive">
+      </mat-form-field>             
+      <mat-form-field appearance="standard" class="full-width">
         <mat-label>Default Country Code</mat-label>
         <input matInput type="text" [formControl]="notification.controls.countryCode" [readonly]="!notificationActive">
       </mat-form-field>     
@@ -73,6 +74,11 @@
         <textarea matInput rows=10 type="text" [formControl]="notification.controls.body" [readonly]="!notificationActive"></textarea>
         <mat-hint>The following replacement fields are available: startTime, location</mat-hint>
       </mat-form-field>
+      <mat-form-field appearance="standard" class="full-width">
+        <mat-label>Cancellation Body</mat-label>
+        <textarea matInput rows=10 type="text" [formControl]="notification.controls.cancelBody" [readonly]="!notificationActive"></textarea>
+        <mat-hint>The following replacement fields are available: startTime, location</mat-hint>
+      </mat-form-field>      
     </mat-tab>
     <mat-tab label="General">
       <mat-form-field appearance="standard">

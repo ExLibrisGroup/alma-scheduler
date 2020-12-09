@@ -90,13 +90,14 @@ export class EventUtilsService {
       return resp;
     }))
 
-  sendNotification = (event: AlmaSchedulerEvent, user: any): Observable<boolean> => {
+  sendNotification = (event: AlmaSchedulerEvent, user: any, message: 'appt' | 'cancel' = 'appt'): Observable<boolean> => {
     let requests = [];
     const notification = this.configuration.notification;
-    const body = notification.body.replace(/{{(\w*)}}/g, (match, str) => {
+    let body = message == 'cancel' ? notification.cancelBody : notification.body;
+    body = body.replace(/{{(\w*)}}/g, (match, str) => {
       switch (str) {
         case 'startTime':
-          return moment(event.startTime).format("dddd, MMMM Do YYYY, hh:mm");
+          return formatDate(event.startTime, notification.dateFormat);
         case 'location':
           return this.configuration.locations.find(l=>l.id==event.location).name;
         default:
@@ -166,5 +167,17 @@ export class EventUtilsService {
       console.error('Error trying to send notification', e);
       return of(false);
     }
+  }
+}
+
+const formatDate = (dt: Date, locale: string) => {
+  const options = {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: 'numeric', minute: 'numeric'
+  };
+  try {
+    return new Intl.DateTimeFormat(locale || [], options).format(dt); 
+  } catch {
+    return dt.toString();
   }
 }

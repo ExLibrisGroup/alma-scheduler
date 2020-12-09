@@ -14,8 +14,10 @@ export class Notification {
   active: boolean = true;
   sms: boolean = false;
   countryCode: string = null;
+  dateFormat: string = null;
   subject: string = 'Your library appointment';
   body: string = "Hi there!\n\nWe're happy to let you know that your appointment at the library has been set for {{startTime}}.\n\nLooking forward to seeing you at {{location}}.\n\n-The library staff";
+  cancelBody: string = "Your appointment at the library has been cancelled."
   replyTo: string = '';
   from: string = 'Your library';
 }
@@ -37,8 +39,7 @@ export const configFormGroup = (configuration: Configuration): FormGroup => {
 }
 
 export const migrateConfiguration = (configuration: Configuration): Configuration => {
-  if (configuration.notification.sms == undefined) configuration.notification.sms = false;
-  if (configuration.notification.countryCode == undefined) configuration.notification.countryCode = '';
+  configuration.notification = Object.assign(new Notification(), configuration.notification);
   return configuration;
 }
 

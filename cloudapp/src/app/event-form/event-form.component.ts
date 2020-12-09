@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { CloudAppRestService } from '@exlibris/exl-cloudapp-angular-lib';
+import { CloudAppRestService, AlertService } from '@exlibris/exl-cloudapp-angular-lib';
 import { debounceTime, tap, switchMap, finalize, filter, map } from 'rxjs/operators';
 import { EventUtilsService } from '../models/event-utils.service';
 import moment from 'moment';
@@ -26,7 +25,7 @@ export class EventFormComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private toastr: ToastrService,
+    private alert: AlertService,
     private restService: CloudAppRestService,
     private configurationService: ConfigurationService,
     private eventUtils: EventUtilsService
@@ -49,10 +48,10 @@ export class EventFormComponent implements OnInit {
 
     this.userSearch.valueChanges
       .pipe(
-        debounceTime(300),
+        debounceTime(500),
         filter(value => typeof value === 'string' && value.length >= 3),
         tap(() => this.searching = true),
-        switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(' ','_')}`)
+        switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(' ','%2b')}`)
           .pipe(finalize(() => this.searching = false))
         ),
       )
@@ -71,7 +70,7 @@ export class EventFormComponent implements OnInit {
       tap(user => this.userSearch.setValue(user)),
     )
     .subscribe({
-      error: e => this.toastr.error('An error occurred: ' + e.message)
+      error: e => this.alert.error('An error occurred: ' + e.message)
     });  
   }
 
@@ -84,10 +83,11 @@ export class EventFormComponent implements OnInit {
       finalize(()=>this.loading = false),
     )
     .subscribe( 
-      success => this.toastr.success(`Event saved. Notification was ${success ? '' : 'NOT '}sent.`),
+      success => this.alert.success(`Event saved. Notification was ${success ? '' : 'NOT '}sent.`, 
+        { keepAfterRouteChange: true }),
       e => {
         console.error('Error saving event', e)
-        this.toastr.error('An error occurred: ' + e.message);
+        this.alert.error('An error occurred: ' + e.message);
       },
       () => setTimeout(() => this.router.navigate(['/main']), 500)
     )
@@ -97,10 +97,14 @@ export class EventFormComponent implements OnInit {
     if (!confirm('Are you sure?')) return;
     this.loading = true;
     this.eventUtils.deleteEvent(this.form.value.id)
-    .pipe(finalize(() => this.loading = false ))
+    .pipe(
+      switchMap(()=>this.restService.call(`/users/${this.form.value.userId}`)),
+      switchMap(user=>this.eventUtils.sendNotification(this.form.value, user, 'cancel')),
+      finalize(()=>this.loading = false),
+    )
     .subscribe(
-      () => this.toastr.success('Event deleted'),
-      e => this.toastr.error('An error occurred: ' + e.message),
+      () => this.alert.success('Event deleted', { keepAfterRouteChange: true }),
+      e => this.alert.error('An error occurred: ' + e.message, { keepAfterRouteChange: true }),
       () => setTimeout(() => this.router.navigate(['/main']), 500)
     )
   }

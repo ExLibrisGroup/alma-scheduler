@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, Injectable } from '@angular/core';
 import { CanDeactivate } from "@angular/router";
-import { ToastrService } from 'ngx-toastr';
+import { AlertService } from '@exlibris/exl-cloudapp-angular-lib';
 import { FormGroup, FormArray } from '@angular/forms';
 import { configFormGroup, locationFormGroup, Colors } from '../models/configuration';
 import { ConfigurationService } from '../models/configuration.service';
@@ -17,7 +17,7 @@ export class ConfigurationComponent implements OnInit {
   saving = false;
 
   constructor(
-    private toastr: ToastrService,
+    private alert: AlertService,
     private configurationService: ConfigurationService
   ) { }
 
@@ -33,10 +33,10 @@ export class ConfigurationComponent implements OnInit {
     this.saving = true;
     this.configurationService.setConfig(this.form.value).subscribe(
       () => {
-        this.toastr.success('Settings successfully saved.');
+        this.alert.success('Settings successfully saved.');
         this.form.markAsPristine();
       },
-      err => this.toastr.error(err.message),
+      err => this.alert.error(err.message),
       ()  => this.saving = false
     );
   }

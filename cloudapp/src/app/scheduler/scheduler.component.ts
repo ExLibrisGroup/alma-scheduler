@@ -4,12 +4,11 @@ import { FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { map, finalize } from 'rxjs/operators';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
-import { ToastrService } from 'ngx-toastr';
 import moment from 'moment';
 import { User } from '../day-view-scheduler/day-view-scheduler.component';
 import { EventUtilsService } from '../models/event-utils.service';
 import { Configuration } from '../models/configuration';
-import { CloudAppStoreService } from '@exlibris/exl-cloudapp-angular-lib';
+import { CloudAppStoreService, AlertService } from '@exlibris/exl-cloudapp-angular-lib';
 import { ConfigurationService } from '../models/configuration.service';
 
 const LOCATIONS_STORE = 'locations';
@@ -30,7 +29,7 @@ export class SchedulerComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private toastr: ToastrService,
+    private alert: AlertService,
     private storeService: CloudAppStoreService,
     private configurationService: ConfigurationService,
     private eventUtils: EventUtilsService
@@ -59,7 +58,7 @@ export class SchedulerComponent implements OnInit {
       events => this.events = events,
       e => {
         console.error('Error retrieving events', e);
-        this.toastr.error('Could not retrieve events')
+        this.alert.error('Could not retrieve events')
       }
     );
   }
@@ -92,7 +91,7 @@ export class SchedulerComponent implements OnInit {
     /* Check capacity */
     const [overlap, capacity] = this.checkCapacity(event);
     if (overlap >= capacity) {
-      this.toastr.warning('Slot is filled to capacity');
+      this.alert.warn('Slot is filled to capacity', { autoClose: true, delay: 5000 });
       return;
     }
 

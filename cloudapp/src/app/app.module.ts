@@ -2,8 +2,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule, getTranslateModule } from '@exlibris/exl-cloudapp-angular-lib';
-import { ToastrModule } from 'ngx-toastr';
+import { MaterialModule, getTranslateModule, AlertService, AlertModule } from '@exlibris/exl-cloudapp-angular-lib';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/moment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -26,13 +25,6 @@ import { ConfigurationService } from './models/configuration.service';
 import { EventUtilsService } from './models/event-utils.service';
 import { ErrorComponent } from './splash/error.component';
 import { SplashComponent } from './splash/splash.component';
-
-export function getToastrModule() {
-  return ToastrModule.forRoot({
-    positionClass: 'toast-top-right',
-    timeOut: 2000
-  });
-}
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -67,7 +59,7 @@ export function getCalendarModule() {
       ReactiveFormsModule,
       FormsModule,
       getTranslateModule(),
-      getToastrModule(),
+      AlertModule,
       getCalendarModule(),
       NgxMatTimepickerModule,
       NgxMatDatetimePickerModule,

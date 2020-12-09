@@ -97,7 +97,12 @@ const sendNotification = async body => {
           body.Message.Body.Text
       )) throw new Error('Invalid email parameters');
   const params = {...body, Source: body.Source + ' <alma-scheduler@exldevnetwork.net>'};
-  await new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
+  try {
+    await new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();  
+  } catch(e) {
+    console.error('Error when sending email to ' + body.Destination.ToAddresses[0], e);
+    throw e;
+  }
 }
 
 const sendSMSNotification = async body => {

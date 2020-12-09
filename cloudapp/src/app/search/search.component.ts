@@ -3,9 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { debounceTime, filter, tap, switchMap, finalize, map } from 'rxjs/operators';
-import { CloudAppRestService, CloudAppEventsService } from '@exlibris/exl-cloudapp-angular-lib';
+import { CloudAppRestService, CloudAppEventsService, AlertService } from '@exlibris/exl-cloudapp-angular-lib';
 import { AppService } from '../app.service';
-import { ToastrService } from 'ngx-toastr';
 import { EventUtilsService } from '../models/event-utils.service';
 import { Configuration } from '../models/configuration';
 import moment from 'moment';
@@ -26,7 +25,7 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private restService: CloudAppRestService,
-    private toastr: ToastrService,
+    private alert: AlertService,
     private router: Router,
     private configurationService: ConfigurationService,
     private eventUtils: EventUtilsService
@@ -70,7 +69,7 @@ export class SearchComponent implements OnInit {
       events => this.events = events,
       e => {
         console.error('Error retrieving events', e);
-        this.toastr.error('Could not retrieve events')
+        this.alert.error('Could not retrieve events')
       }
     );
   }
