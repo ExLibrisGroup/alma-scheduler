@@ -51,7 +51,7 @@ export class EventFormComponent implements OnInit {
         debounceTime(500),
         filter(value => typeof value === 'string' && value.length >= 3),
         tap(() => this.searching = true),
-        switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(' ','%2b')}`)
+        switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(/ /g,'%2b')}`)
           .pipe(finalize(() => this.searching = false))
         ),
       )

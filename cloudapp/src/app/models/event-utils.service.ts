@@ -176,8 +176,8 @@ const formatDate = (dt: Date, locale: string) => {
     hour: 'numeric', minute: 'numeric'
   };
   try {
-    return new Intl.DateTimeFormat(locale || [], options).format(dt); 
-  } catch {
+    return new Intl.DateTimeFormat(locale || [], options).format(new Date(dt)); 
+  } catch (e) {
     return dt.toString();
   }
 }
