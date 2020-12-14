@@ -41,7 +41,7 @@ export class SearchComponent implements OnInit {
       debounceTime(300),
       filter(value => typeof value === 'string' && value.length >= 3),
       tap(() => this.searching = true),
-      switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(' ','_')}`)
+      switchMap(value => this.restService.call(`/users?limit=20&q=ALL~${value.replace(/ /g,'%2b')}`)
         .pipe(finalize(() => this.searching = false))
       ),
     )
