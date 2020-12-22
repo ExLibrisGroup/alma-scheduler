@@ -40,6 +40,10 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+          <mat-form-field appearance="standard" class="full-width">
+            <mat-label>Reply To Address</mat-label>
+            <input matInput type="text" [formControl]="location.controls.replyTo" >
+          </mat-form-field>
         </mat-card-content>
       </mat-card>      
       <button mat-button mat-stroked-button aria-label="Add" (click)="addLocation()">

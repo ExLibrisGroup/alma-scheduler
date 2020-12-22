@@ -93,13 +93,14 @@ export class EventUtilsService {
   sendNotification = (event: AlmaSchedulerEvent, user: any, message: 'appt' | 'cancel' = 'appt'): Observable<boolean> => {
     let requests = [];
     const notification = this.configuration.notification;
+    const location = this.configuration.locations.find(l=>l.id==event.location);
     let body = message == 'cancel' ? notification.cancelBody : notification.body;
     body = body.replace(/{{(\w*)}}/g, (match, str) => {
       switch (str) {
         case 'startTime':
           return formatDate(event.startTime, notification.dateFormat);
         case 'location':
-          return this.configuration.locations.find(l=>l.id==event.location).name;
+          return location.name;
         default:
           return '';
       }
@@ -112,7 +113,7 @@ export class EventUtilsService {
             user.contact_info.email.some(e=>e.preferred))
     ) {
       const email = user.contact_info.email.find(e=>e.preferred).email_address;
-      const replyTo = notification.replyTo ? [notification.replyTo] : [];
+      const replyTo = location.replyTo || notification.replyTo || null;
       let payload = {
         "Destination": {
           "ToAddresses": [email]},
@@ -128,7 +129,7 @@ export class EventUtilsService {
               "Data": notification.subject
             }
           },
-          "ReplyToAddresses": replyTo,
+          "ReplyToAddresses": [replyTo],
           "Source": notification.from
         };
       requests.push(this.http.post(`${environment.service}/notifications/email`, payload, { headers: this.headers }))

@@ -33,6 +33,13 @@
       div.title a {
         margin-left: auto;
     }
+
+    @media print {
+        .mat-tab-header, 
+        .mat-button-base {
+            display: none !important;
+        }
+    }
 }
 
 @import "../../node_modules/angular-calendar/css/angular-calendar.css";

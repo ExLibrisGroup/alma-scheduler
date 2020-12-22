@@ -27,6 +27,7 @@ export class Location {
   color: string = Object.keys(Colors)[rand(Object.keys(Colors).length)];
   name: string = 'Location';
   capacity: number = 1;
+  replyTo: string = '';
 }
 
 export interface Color {
@@ -40,6 +41,10 @@ export const configFormGroup = (configuration: Configuration): FormGroup => {
 
 export const migrateConfiguration = (configuration: Configuration): Configuration => {
   configuration.notification = Object.assign(new Notification(), configuration.notification);
+  const defaultLocation = new Location();
+  configuration.locations.forEach((loc, i) =>
+    configuration.locations[i] = Object.assign({...defaultLocation}, loc)
+  );
   return configuration;
 }
 

@@ -127,4 +127,8 @@ export class SchedulerComponent implements OnInit {
     if (!this._viewDate) this.viewDate = moment();
     return this._viewDate;
   }
+
+  print() {
+    window.print();
+  }
 }
