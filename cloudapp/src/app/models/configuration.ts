@@ -1,4 +1,4 @@
-import { FormGroup } from '@angular/forms';
+import { FormArray, FormGroup, Validators } from '@angular/forms';
 import { FormGroupUtil } from '@exlibris/exl-cloudapp-angular-lib';
 import * as uuid from 'uuid';
 
@@ -36,7 +36,10 @@ export interface Color {
 }
 
 export const configFormGroup = (configuration: Configuration): FormGroup => {
-  return FormGroupUtil.toFormGroup(migrateConfiguration(configuration));
+  let fg = FormGroupUtil.toFormGroup(migrateConfiguration(configuration));
+  fg.get('notification.replyTo').setValidators(Validators.email);
+  (fg.get('locations') as FormArray).controls.forEach(c=>c.get('replyTo').setValidators(Validators.email));
+  return fg;
 }
 
 export const migrateConfiguration = (configuration: Configuration): Configuration => {
@@ -50,7 +53,9 @@ export const migrateConfiguration = (configuration: Configuration): Configuratio
 
 export const locationFormGroup = (location: Location = null): FormGroup => {
   if (location==null) location = new Location();
-  return FormGroupUtil.toFormGroup(location);
+  let fg = FormGroupUtil.toFormGroup(location);
+  fg.get('replyTo').setValidators(Validators.email);
+  return fg;
 }
 
 export const Colors: any = {

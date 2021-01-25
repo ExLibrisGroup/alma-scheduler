@@ -30,6 +30,11 @@ export class ConfigurationComponent implements OnInit {
   }
 
   save() {
+    this.alert.clear();
+    if (!this.form.valid) {
+      this.form.markAllAsTouched();
+      return this.alert.error('Please fix the errors in the form.')
+    }
     this.saving = true;
     this.configurationService.setConfig(this.form.value).subscribe(
       () => {
