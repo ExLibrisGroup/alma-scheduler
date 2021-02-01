@@ -96,7 +96,7 @@
       <mat-form-field appearance="standard">
         <mat-label>Default duration</mat-label>
         <mat-select formControlName="duration">
-          <mat-option *ngFor="let min of [5,10,15,20,30]" [value]="min">{{min}} minutes</mat-option>
+          <mat-option *ngFor="let min of [5,10,15,20,30,60,120,180,300,480]" [value]="min">{{formatTime(min)}}</mat-option>
         </mat-select>     
       </mat-form-field>
       <mat-form-field appearance="standard">

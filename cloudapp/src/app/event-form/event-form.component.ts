@@ -7,6 +7,7 @@ import { EventUtilsService } from '../models/event-utils.service';
 import moment from 'moment';
 import { Configuration } from '../models/configuration';
 import { ConfigurationService } from '../models/configuration.service';
+import { formatTime } from '../models/utils';
 
 @Component({
   selector: 'app-event-form',
@@ -21,6 +22,7 @@ export class EventFormComponent implements OnInit {
   searching = false;
   users: any[];
   userSearch = new FormControl();
+  formatTime = formatTime;
 
   constructor(
     private route: ActivatedRoute,

@@ -42,7 +42,7 @@
     [refresh]="refresh"
     [dayStartHour]="config.startHour"
     [dayEndHour]="config.endHour"
-    [hourSegments]="60/config.duration"
+    [hourSegments]="segments"
     (eventTimesChanged)="eventTimesChanged($event)"
     (eventClicked)="eventClicked($event)"
     (userChanged)="userChanged($event)"

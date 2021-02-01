@@ -128,6 +128,10 @@ export class SchedulerComponent implements OnInit {
     return this._viewDate;
   }
 
+  get segments(): number {
+    return Math.max(60/this.config.duration, 2)
+  }
+
   print() {
     window.print();
   }

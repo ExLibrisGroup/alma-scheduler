@@ -4,6 +4,7 @@ import { AlertService } from '@exlibris/exl-cloudapp-angular-lib';
 import { FormGroup, FormArray } from '@angular/forms';
 import { configFormGroup, locationFormGroup, Colors } from '../models/configuration';
 import { ConfigurationService } from '../models/configuration.service';
+import { formatTime } from '../models/utils';
 
 @Component({
   selector: 'app-configuration',
@@ -15,6 +16,7 @@ export class ConfigurationComponent implements OnInit {
   form: FormGroup;
   Colors = Colors;
   saving = false;
+  formatTime = formatTime;
 
   constructor(
     private alert: AlertService,
