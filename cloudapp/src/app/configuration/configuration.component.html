@@ -44,7 +44,7 @@
             <mat-label>Reply-To Address</mat-label>
             <input matInput type="email" [formControl]="location.controls.replyTo" 
               placeholder="Ex. reply@example.com">
-            <mat-error *ngIf="location.controls.replyTo.hasError('email') || submitted">
+            <mat-error *ngIf="location.controls.replyTo.hasError('email')">
               Please enter a valid email address
             </mat-error>              
           </mat-form-field>
@@ -69,7 +69,7 @@
         <mat-label>Reply-To Address</mat-label>
         <input matInput type="email" [formControl]="notification.controls.replyTo" [readonly]="!notificationActive"
           placeholder="Ex. reply@example.com">     
-        <mat-error *ngIf="notification.controls.replyTo.hasError('email') || submitted">
+        <mat-error *ngIf="notification.controls.replyTo.hasError('email')">
           Please enter a valid email address
         </mat-error>          
       </mat-form-field>            
