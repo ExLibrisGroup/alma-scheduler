@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Alma Scheduler API
+  
+Globals:
+  Function:
+    Timeout: 30
+Parameters:
+  MongodbUri:
+    Type: String
+    Description: URI for Mongo DB
+  TwilioAccount:
+    Type: String
+    Description: Account ID for Twilio
+  TwilioAuth: 
+    Type: String
+    Description: Authorization string for Twilio
+  TwilioFrom:
+    Type: String
+    Description: From phone number for Twilio
+
+Resources:
+  AlmaSchedulerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler.handler
+      Layers:
+        - !Ref AlmaSchedulerDependencies
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongodbUri
+          TWILIO_ACCOUNT: !Ref TwilioAccount
+          TWILIO_AUTH: !Ref TwilioAuth
+          TWILIO_FROM: !Ref TwilioFrom
+      MemorySize: 1028
+      FunctionName: AlmaSchedulerService
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Options:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: options
+        GetEvents:
+          Type: HttpApi
+          Properties:
+            Path: /events/{instCode}
+            Method: get
+        CreateEvent:
+          Type: HttpApi
+          Properties:
+            Path: /events/{instCode}
+            Method: post
+        UpdateEvent:
+          Type: HttpApi
+          Properties:
+            Path: /events/{instCode}/{id}
+            Method: put            
+        DeleteEvent:
+          Type: HttpApi
+          Properties:
+            Path: /events/{instCode}/{id}
+            Method: delete   
+        GetEvent:
+          Type: HttpApi
+          Properties:
+            Path: /events/{instCode}/{id}
+            Method: get   
+        GetPatronEvents:
+          Type: HttpApi
+          Properties:
+            Path: /patron/events
+            Method: get   
+        CreatePatronEvent:
+          Type: HttpApi
+          Properties:
+            Path: /patron/events
+            Method: post   
+        DeletePatronEvent:
+          Type: HttpApi
+          Properties:
+            Path: /patron/events/{id}
+            Method: delete     
+        GetPatronSlots:
+          Type: HttpApi
+          Properties:
+            Path: /patron/slots
+            Method: get                                  
+        SendEmail:
+          Type: HttpApi
+          Properties:
+            Path: /notifications/email
+            Method: post   
+        SendSms:
+          Type: HttpApi
+          Properties:
+            Path: /notifications/sms
+            Method: post 
+        SetConfig:
+          Type: HttpApi
+          Properties:
+            Path: /config/{instCode}
+            Method: put
+        GetConfig:
+          Type: HttpApi
+          Properties:
+            Path: /patron/config 
+            Method: get           
+  AlmaSchedulerDependencies:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${AWS::StackName}-Dependencies"
+      Description: Dependencies for Alma Scheduler Service
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - nodejs12.x
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: logs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+      - PolicyName: ses
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ses:SendEmail
+            Resource: arn:aws:ses:*:*:*
+
+Outputs:
+  AlmaSchedulerApi:
+    Description: "Endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"

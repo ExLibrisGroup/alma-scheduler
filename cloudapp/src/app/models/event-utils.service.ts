@@ -90,6 +90,9 @@ export class EventUtilsService {
       return resp;
     }))
 
+  updateConfig = (config: any): Observable<any> => 
+    this.http.put<any>(`${environment.service}/config/${this.instCode}`, config, { headers: this.headers });
+
   sendNotification = (event: AlmaSchedulerEvent, user: any, message: 'appt' | 'cancel' = 'appt'): Observable<boolean> => {
     let requests = [];
     const notification = this.configuration.notification;
@@ -143,9 +146,9 @@ export class EventUtilsService {
     ) {
       let phone: string = user.contact_info.phone.find(p=>p.preferred).phone_number;
       if (!phone.startsWith('+')) {
-        phone = phone.startsWith(notification.countryCode)
-          ? '+' + phone
-          : '+' + notification.countryCode + phone;
+        phone = !notification.countryCode || phone.startsWith(notification.countryCode)
+            ? '+' + phone
+            : '+' + notification.countryCode + phone;
       }
       let payload = {
         message: body,

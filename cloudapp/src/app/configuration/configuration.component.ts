@@ -5,6 +5,8 @@ import { FormGroup, FormArray } from '@angular/forms';
 import { configFormGroup, locationFormGroup, Colors } from '../models/configuration';
 import { ConfigurationService } from '../models/configuration.service';
 import { formatTime } from '../models/utils';
+import { EventUtilsService } from '../models/event-utils.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-configuration',
@@ -20,7 +22,8 @@ export class ConfigurationComponent implements OnInit {
 
   constructor(
     private alert: AlertService,
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
+    private eventUtils: EventUtilsService,
   ) { }
 
   ngOnInit() {
@@ -38,7 +41,11 @@ export class ConfigurationComponent implements OnInit {
       return this.alert.error('Please fix the errors in the form.')
     }
     this.saving = true;
-    this.configurationService.setConfig(this.form.value).subscribe(
+    this.configurationService.setConfig(this.form.value)
+    .pipe(
+      switchMap(()=>this.eventUtils.updateConfig(this.form.value))
+    )
+    .subscribe(
       () => {
         this.alert.success('Settings successfully saved.');
         this.form.markAsPristine();

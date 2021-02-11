@@ -1,5 +1,5 @@
 const utils = require('./utils');
-const { auth } = require('./authorizer/index');
+const { auth, authPrimo } = require('./authorizer');
 require('dotenv').config();
 const MONGODB_URI = process.env.MONGODB_URI;
 const validateInstCode = process.env.VALIDATE_INST_CODE != 'false';
@@ -12,29 +12,42 @@ let client = null;
 let collection;
 
 const handler = async (event, context) => {
-  let result;
+  let result, userId, instCode, displayName;
+  utils.fixEvent(event);
   context.callbackWaitsForEmptyEventLoop = false;
   const body = JSON.parse(event.body||'{}');
-  const instCode = event.pathParameters && event.pathParameters.instCode;
+  instCode = event.pathParameters && event.pathParameters.instCode;
+  userId = event.queryStringParameters && event.queryStringParameters.userId;
   if (event.requestContext && event.requestContext.http.method == 'OPTIONS') {
     result = { statusCode: 204 };
     return utils.cors(result, event);
   }
   /* Validate token */
-  const token = auth(event.headers.authorization);
-  if (!token || (instCode && validateInstCode && instCode != token.inst_code)) {
-    result = utils.responses.unauthorized();
-    return utils.cors(result, event);
+  let token;
+  if (event.routeKey.indexOf('/patron') >= 0) {
+    /* Patron - use Primo VE JWT */
+    token = await authPrimo(event.headers.authorization, event.headers['x-exl-apikey']);
+    if (!token) return utils.cors(utils.responses.unauthorized(), event);
+    instCode = token.institution;
+    userId = token.userName;
+    ({ displayName } = token);
+  } else {
+    token = await auth(event.headers.authorization);
+    if (!token || (instCode && validateInstCode && instCode != token.inst_code)) {
+      return utils.cors(utils.responses.unauthorized(), event);
+    }
   }
 
   try {
     await connect(MONGODB_URI);
-    if (instCode)
+    if (event.routeKey.indexOf('/config') >= 0) {
+      collection = client.collection('config');
+    } else if (instCode) {
       collection = client.collection(instCode);
+    } 
+    const date = event.queryStringParameters && event.queryStringParameters.date; 
     switch (event.routeKey) {
       case 'GET /events/{instCode}':
-        const date = event.queryStringParameters && event.queryStringParameters.date;
-        const userId = event.queryStringParameters && event.queryStringParameters.userId;
         result = utils.responses.success(await getEvents(date, userId));
         break;
       case 'POST /events/{instCode}':
@@ -49,12 +62,34 @@ const handler = async (event, context) => {
       case 'GET /events/{instCode}/{id}':
         result = utils.responses.success(await getEvent(event.pathParameters.id));
         break;
+      case 'GET /patron/events': 
+        result = utils.responses.success(await getEvents(date, userId));
+        break;
+      case 'POST /patron/events':
+        Object.assign(body, { userId, title: `${displayName} (${userId})`});
+        result = utils.responses.success(await addEvent(body));
+        break;
+      case 'DELETE /patron/events/{id}': 
+        const checkEvent = await getEvent(event.pathParameters.id);
+        if (checkEvent.userId != userId) result = utils.responses.unauthorized();
+        else result = utils.responses.success(await deleteEvent(event.pathParameters.id));
+        break;      
+      case 'GET /patron/slots':
+        if (!date) result = utils.responses.error('Date required');
+        else result = utils.responses.success(await getSlots(date));
+        break;
       case 'POST /notifications/email':
         result = utils.responses.success(await sendNotification(body));
         break;
       case 'POST /notifications/sms':
         result = utils.responses.success(await sendSMSNotification(body));
-        break;  
+        break; 
+      case 'PUT /config/{instCode}':
+        result = utils.responses.success(await updateConfig(instCode, body));
+        break;
+      case 'GET /patron/config':
+        result = utils.responses.success(await getConfig(instCode));
+        break; 
       default:
         result = utils.responses.notfound();
     }
@@ -76,9 +111,8 @@ const getEvents = async (date, userId) => {
   return await collection.find(query).toArray();
 }
 
-const getEvent = async id => {
-  return await collection.findOne({_id: new ObjectId(id)});
-}
+const getEvent = async id =>
+  await collection.findOne({_id: new ObjectId(id)});
 
 const addEvent = async body =>
   await collection.insertOne(body);
@@ -88,6 +122,20 @@ const updateEvent = async (id, body) =>
 
 const deleteEvent = async id => 
   await collection.findOneAndDelete({_id: new ObjectId(id)});
+
+const updateConfig = async (instCode, body) =>
+  await collection.findOneAndReplace({instCode}, {instCode, ...body}, {upsert: true});
+
+const getConfig = async instCode => 
+  await collection.findOne({instCode});
+
+const getSlots = async date => {
+  /* Anonymized list of appointments */
+  const list = await getEvents(date, null)
+  return list.map(e=>(
+    { startTime: e.startTime, location: e.location, duration: e.duration }
+  ))
+}
 
 const sendNotification = async body => {
   if (!(  body.Destination && 

@@ -2,7 +2,7 @@ const cors = ( response, event ) => {
   if (!response.headers) response.headers = {};
   response.headers['Access-Control-Allow-Origin'] = getOrigin(event);
   response.headers['Access-Control-Allow-Credentials'] = 'true';
-  response.headers['Access-Control-Allow-Headers'] = 'authorization, content-type';
+  response.headers['Access-Control-Allow-Headers'] = 'authorization, content-type, x-exl-apikey';
   response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
   return response;
 }
@@ -16,4 +16,21 @@ const responses = {
 
 const getOrigin = event => event.headers.origin || event.headers.Origin || '*';
 
-module.exports = { cors, responses };
+const fixEvent = event => {
+  /* Lower case headers */
+  Object.keys(event.headers).forEach(h=>{
+    if (h!=h.toLowerCase()) {
+      event.headers[h.toLowerCase()] = event.headers[h];
+      delete event.headers[h];
+    }
+  })
+  /* Fix route */
+  event.routeKey = event.routeKey.replace(/[<>]/g, function (c) {
+    switch (c) {
+        case '<': return '{';
+        case '>': return '}';
+    }
+  });
+}
+
+module.exports = { cors, responses, fixEvent };
