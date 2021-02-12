@@ -1,0 +1,52 @@
+
+#primo-explore-appointment-scheduler {
+	& {
+		max-width: 500px;
+		margin: 0 15px;
+		position: relative;
+	}
+	md-list-item {
+		padding-top: 7px;
+	}
+	.loading-shade {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		background: rgba(0, 0, 0, 0.15);
+		z-index: 99;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.close {
+		float: right;
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: 1;
+		color: #000;
+		text-shadow: 0 1px 0 #fff;
+		opacity: .5;
+		margin: 1px;
+		padding: 0;
+	}
+	a.close {
+		cursor: pointer;
+		text-decoration: none !important;
+	}
+	a.close:hover {
+		text-decoration: none;
+	}
+}
+
+.md-calendar-selected-date .md-calendar-date-selection-indicator  {
+	background: #87898b;
+}
+.md-calendar-day-header {
+	background: #cccccc;
+}
+
+.md-calendar-date-selection-indicator:hover {
+	background: #cccccc;
+}
