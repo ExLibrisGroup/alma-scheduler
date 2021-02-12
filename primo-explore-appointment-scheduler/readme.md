@@ -13,9 +13,11 @@ Adds a widget in Primo account overview screen to allow patrons to manage their 
 
 ### Screenshots
 ![screenshot](primo-explore-appointment-scheduler-account.png)
+
 Account home page
 
 ![screenshot](primo-explore-appointment-scheduler-widget.png)
+
 Widget in new appointment state
 
 ## Install
