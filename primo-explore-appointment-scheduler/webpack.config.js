@@ -2,18 +2,17 @@ const path = require('path');
 
 const config = {
   entry: {
-    index: path.resolve(__dirname, 'src/index.js'),
+    index: path.resolve('./', 'src/index.js'),
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve('./', 'dist'),
     filename: 'index.js',
   },
-  module : {
-    rules: [  
-      {
+  module: {
+    rules: [{
         test: /\.scss$/,
         use: [
-          'style-loader', 
+          'style-loader',
           'css-loader',
           'sass-loader',
         ]
@@ -26,11 +25,12 @@ const config = {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: 'babel-loader', /* transpile to ES5 as Primo Dev Env uses Uglifier which doesn't support ES6 */
+          loader: 'babel-loader',
+          /* transpile to ES5 as Primo Dev Env uses Uglifier which doesn't support ES6 */
           options: {
             presets: ['@babel/preset-env']
-    }
-  }
+          }
+        }
       }
     ]
   },

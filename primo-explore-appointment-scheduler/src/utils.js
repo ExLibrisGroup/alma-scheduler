@@ -6,6 +6,9 @@ export const sortByStartTime = (a, b) => {
   return a1 < b1 ? -1 : a1 > b1 ? 1 : 0;
 }; 
 
+export const formatDate = (dt, locale='en') => (DateTime.isDateTime(dt) ? dt : DateTime.fromISO(dt)).setLocale(locale).toLocaleString(DateTime.DATETIME_MED);
+export const formatTime = (dt, locale='en') => (DateTime.isDateTime(dt) ? dt : DateTime.fromISO(dt)).setLocale(locale).toLocaleString(DateTime.TIME_SIMPLE);
+
 export const buildSlots = (events, config, newEvent) => {
   const { startHour, endHour, duration } = config;
   /* Build initial slots */

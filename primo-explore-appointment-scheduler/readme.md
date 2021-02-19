@@ -55,7 +55,6 @@ Then add the `appointment-scheduler` component to the `prmAccountOverviewAfter` 
 app.component('prmAccountOverviewAfter', {
   bindings: {parentCtrl: '<'},
   template: `<appointment-scheduler 
-    ng-if="$ctrl.parentCtrl.$stateParams.section=='overview'" 
     parent-ctrl="$ctrl.parentCtrl"
     apikey="l8xx..."
   ></appointment-scheduler>`
