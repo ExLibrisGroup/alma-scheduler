@@ -10,17 +10,17 @@
         </h2>
       </div>
     </div>
-    <div ng-if="msg" class="layout-margin layout-padding" ng-style="{'background-color': msg.type == 'warning' ? '#F9A92E' : (msg.type == 'error' ? '#FA4B51' : '#62C131')}">
+    <div ng-if="vm.msg" class="layout-margin layout-padding" ng-style="{'background-color': vm.msg.type == 'warning' ? '#F9A92E' : (vm.msg.type == 'error' ? '#FA4B51' : '#62C131')}">
       <a class="close" (click)="clearAlert()">&times;</a>
-      <span>{{ msg.text }}</span>
+      <span>{{ vm.msg.text }}</span>
     </div>
     <div class="layout-padding layout-column">
-      <ng-template ng-if="appointments">
-        <md-list flex ng-if="appointments.length && appointments.length > 0">
+      <ng-template ng-if="vm.appointments">
+        <md-list flex ng-if="vm.appointments.length && vm.appointments.length > 0">
           <md-subheader class="md-no-sticky">{{translate('appointmentlist')}}</md-subheader>
-          <md-list-item class="md-2-line" ng-repeat="appt in appointments">
+          <md-list-item class="md-2-line" ng-repeat="appt in vm.appointments">
             <div class="md-list-item-text">
-              <h3>{{ appt.startTime | formatDate:locale }}</h3>
+              <h3>{{ appt.startTime | formatDate:vm.locale }}</h3>
               <p>{{ appt.location }}</p>
             </div>
             <button 
@@ -34,14 +34,14 @@
             </button>                
           </md-list-item>           
         </md-list>
-        <p ng-if="!appointments.length || appointments.length == 0">{{translate('noappointments')}}</p>
+        <p ng-if="!vm.appointments.length || vm.appointments.length == 0">{{translate('noappointments')}}</p>
       </ng-template>
     </div>
     <!---->
     <div>
       <button 
         aria-label="Add appointment"
-        ng-click="showForm=true; newEventChanged();"
+        ng-click="vm.showForm=true; newEventChanged();"
         class="button-with-icon zero-margin md-button md-primoExplore-theme md-ink-ripple"
         type="button"
       >
@@ -50,7 +50,7 @@
       </button>
     </div>
     <!---->
-    <md-card ng-if="showForm">
+    <md-card ng-if="vm.showForm">
       <md-card-title>
         <md-card-title-text>
           <span class="md-headline">{{translate('newappointment')}}</span>
@@ -59,8 +59,8 @@
       <md-card-content>
         <md-input-container class="underlined-input md-primoExplore-theme layout-column" layout="column">
           <label>{{translate('location')}}</label> 
-          <md-select ng-model="newEvent.location" ng-change="newEventChanged()">
-            <md-option ng-repeat="location in config.locations" ng-value="location.id">
+          <md-select ng-model="vm.newEvent.location" ng-change="newEventChanged()">
+            <md-option ng-repeat="location in vm.config.locations" ng-value="location.id">
               {{location.name}}
             </md-option>
           </md-select>
@@ -68,26 +68,26 @@
         </md-input-container>
         <md-input-container class="underlined-input">
           <label>{{translate('date')}}</label>
-          <md-datepicker ng-model="newEvent.startDate" md-placeholder="Select date"
+          <md-datepicker ng-model="vm.newEvent.startDate" md-placeholder="Select date"
             input-aria-describedby="datepicker-description"
             input-aria-labelledby="datepicker-header"
             ng-change="newEventChanged()"
-            md-min-date="minDate"
+            md-min-date="vm.minDate"
             style="display: inline-block; margin-right: 15px;"
           ></md-datepicker>  
         </md-input-container>
         <md-input-container class="underlined-input">
           <label>{{translate('starttime')}}</label>
-          <md-select ng-model="newEvent.startTime" style="margin: unset">
-            <md-option ng-repeat="slot in slots" ng-value="slot">
-              {{ slot | formatTime:locale }}
+          <md-select ng-model="vm.newEvent.startTime" style="margin: unset">
+            <md-option ng-repeat="slot in vm.slots" ng-value="slot">
+              {{ slot | formatTime:vm.locale }}
             </md-option>
           </md-select>
         </md-input-container>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
         <md-button ng-click="hideForm()">{{translate('cancel')}}</md-button>
-        <md-button ng-click="add()" ng-disabled="!(newEvent.startTime && newEvent.location)">{{translate('save')}}</md-button>
+        <md-button ng-click="add()" ng-disabled="!(vm.newEvent.startTime && vm.newEvent.location)">{{translate('save')}}</md-button>
       </md-card-actions>
     </md-card>
   </div>

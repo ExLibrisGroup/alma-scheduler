@@ -7,9 +7,8 @@ const { name } = require('../package.json');
 const componentName = camelCase(name);
 
 /* Update dependencies with Primo Studio Congif instead of $attrs */
-controller.$inject = [
-  '$scope', `${componentName}StudioConfig`, 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
-];
+const attr = controller.$inject.indexOf('$attrs');
+if (~attr) controller.$inject[attr] = `${componentName}StudioConfig`;
 
 /* Add component with component name by convention */
 export const appointmentScheduler = AppointmentSchedulerModule

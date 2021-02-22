@@ -1,10 +1,10 @@
 {
   "name": "primo-studio-appointment-scheduler",
-  "version": "0.0.5",
+  "version": "0.0.10",
   "description": "Ex Libris Primo Studio add-on for use with the Appointment Scheduler Cloud App",
   "main": "./js/primoStudioAppointmentScheduler.js",
   "scripts": {
-    "build": "webpack --mode=production"
+    "build": "node version.js && webpack --mode=production"
   },
   "keywords": [
     "primo-explore",
