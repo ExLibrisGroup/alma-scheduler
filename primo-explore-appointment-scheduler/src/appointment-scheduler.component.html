@@ -1,7 +1,5 @@
 <div class="tiles-grid-tile" id="primo-explore-appointment-scheduler" ng-if="$ctrl.parentCtrl.$stateParams.section=='overview'">
-  <div class="loading-shade" ng-if="loading">
-  <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-  </div>
+  <prm-spinner ng-if="vm.loading" class="default-loader dark-on-light overlay-cover no-text" layout="row" layout-align="center center"></prm-spinner>
   <div class="tile-content layout-column">
     <div class="tile-header layout-column">
       <div layout="row" layout-align="space-between" class="layout-align-space-between-stretch layout-row">
