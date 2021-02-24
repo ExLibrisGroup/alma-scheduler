@@ -28,7 +28,12 @@ const config = {
           loader: 'babel-loader',
           /* transpile to ES5 as Primo Dev Env uses Uglifier which doesn't support ES6 */
           options: {
-            presets: ['@babel/preset-env']
+            presets: [
+              '@babel/preset-env',
+              {
+                'plugins': ['@babel/plugin-proposal-class-properties']
+              }
+            ]
           }
         }
       }

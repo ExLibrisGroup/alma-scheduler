@@ -1,6 +1,6 @@
 {
   "name": "primo-explore-appointment-scheduler",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Ex Libris Primo New UI add-on for use with the Appointment Scheduler Cloud App",
   "main": "./dist/index.js",
   "scripts": {
@@ -14,6 +14,7 @@
   "license": "BSD-3-Clause",
   "devDependencies": {
     "@babel/core": "^7.12.13",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.12.13",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.0.2",
@@ -27,8 +28,8 @@
   },
   "homepage": "https://github.com/exlibrisgroup/alma-scheduler/tree/master/primo-explore-appointment-scheduler#readme",
   "repository": {
-      "type": "git",
-      "url": "https://github.com/exlibrisgroup/alma-scheduler",
-      "directory": "primo-explore-appointment-scheduler"
+    "type": "git",
+    "url": "https://github.com/exlibrisgroup/alma-scheduler",
+    "directory": "primo-explore-appointment-scheduler"
   }
 }
