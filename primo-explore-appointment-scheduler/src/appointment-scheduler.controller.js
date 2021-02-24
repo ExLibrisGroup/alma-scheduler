@@ -6,7 +6,23 @@ import { buildSlots } from './utils';
 const DEFAULT_LOCALE = 'en';
 
 function AppointmentSchedulerController ($scope, $attrs, options, service) {
+  var vm = this;
+  vm.newEvent = {
+    startDate: new Date(),
+    location: 0,
+    startTime: null,
+  };
+  vm.locale = this.parentCtrl.$stateParams.lang;
+  vm.minDate = new Date();
+  vm.loading = false;
+  vm.msg = null;
+  vm.config = null;
+  vm.appointments = [];
+  vm.slots = [];
+  vm.showForm = false;
+  
   this.$onInit = () => {
+    /*
     $scope.vm = {
       newEvent: {
         startDate: new Date(),
@@ -22,91 +38,93 @@ function AppointmentSchedulerController ($scope, $attrs, options, service) {
       slots: null,
       showForm: false,
     };
-    this.mergedi18n = merge(i18n, this.i18n);
+    */
+    /* Merge i18n with provided strings */
+    vm.mergedi18n = merge(i18n, vm.i18n);
 
     /* Set apikey, $attrs can be a Primo Studio config array or the attrs hash */
     const attrs = Array.isArray($attrs) ? $attrs[0] : $attrs;
     options.apikey = attrs.apikey;
 
     /* Load config and events */
-    $scope.vm.loading = true;
+    vm.loading = true;
     service.getConfig()
     .then(data => {
-      if (!data) $scope.vm.msg = { text: $scope.translate('noconfig'), type: 'warning' };
-      else $scope.vm.config = data;
+      if (!data) vm.msg = { text: this.translate('noconfig'), type: 'warning' };
+      else vm.config = data;
     })
     .then(() => this.getEvents())
     .catch( e => {
-      $scope.vm.msg = { text: $scope.translate('serviceerror'), type: 'error' };
+      vm.msg = { text: this.translate('serviceerror'), type: 'error' };
       console.warn(e) 
     })
-    .finally( () => $scope.vm.loading = false );   
+    .finally( () => vm.loading = false );   
   }
 
   this.getEvents = () => {
-    service.getEvents($scope.vm.config && $scope.vm.config.locations)
-    .then(appointments => $scope.vm.appointments = appointments)
+    service.getEvents(vm.config && vm.config.locations)
+    .then(appointments => vm.appointments = appointments)
   }
 
-  $scope.translate = key => 
-    this.mergedi18n[$scope.vm.locale] && this.mergedi18n[$scope.vm.locale][key] || 
-    this.mergedi18n[DEFAULT_LOCALE][key] || 
+  this.translate = key => 
+    vm.mergedi18n[vm.locale] && vm.mergedi18n[vm.locale][key] || 
+    vm.mergedi18n[DEFAULT_LOCALE][key] || 
     key;
 
-  $scope.cancel = id => {
-    if (!confirm($scope.translate('cancelconfirm'))) return;
-    $scope.vm.loading = true;
+  this.cancel = id => {
+    if (!confirm(this.translate('cancelconfirm'))) return;
+    vm.loading = true;
     service.deleteAppointment(id)
     .then(() => {
-      $scope.vm.msg = { text: $scope.translate('cancelsuccess'), type: 'success' };          
-      setTimeout( () => { $scope.vm.msg = null; $scope.$apply(); }, 3000);
-      $scope.hideForm();
+      vm.msg = { text: this.translate('cancelsuccess'), type: 'success' };          
+      setTimeout( () => { vm.msg = null; $scope.$apply(); }, 3000);
+      this.hideForm();
     })
     .then(() => this.getEvents() )
     .catch( e => {
-      $scope.vm.msg = { text: $scope.translate('cancelfail') + (e.message || e.statusText), type: 'error' };
-      setTimeout( () => { $scope.vm.msg = null; $scope.$apply(); }, 5000);
+      vm.msg = { text: this.translate('cancelfail') + (e.message || e.statusText), type: 'error' };
+      setTimeout( () => { vm.msg = null; $scope.$apply(); }, 5000);
     })
-    .finally( () => $scope.vm.loading = false );
+    .finally( () => vm.loading = false );
   }
 
-  $scope.newEventChanged = () => {
-    if ($scope.vm.newEvent.startDate && $scope.vm.newEvent.location) {
-      const dt = DateTime.fromJSDate($scope.vm.newEvent.startDate).toISODate();
+  this.newEventChanged = () => {
+    if (vm.newEvent.startDate && vm.newEvent.location) {
+      const dt = DateTime.fromJSDate(vm.newEvent.startDate).toISODate();
       service.getSlots(dt)
       .then(data=>{
-        const events = data.filter(e=>e.location==$scope.vm.newEvent.location);
-        $scope.vm.slots = buildSlots(events, $scope.vm.config, $scope.vm.newEvent);
-        $scope.vm.newEvent.startTime = null;          
+        const events = data.filter(e=>e.location==vm.newEvent.location);
+        vm.slots = buildSlots(events, vm.config, vm.newEvent);
+        vm.newEvent.startTime = null;          
       })
     }
   }
 
-  $scope.add = () => {
-    const newEvent = $scope.vm.newEvent;
+  this.add = () => {
+    const newEvent = vm.newEvent;
     const body = {
-      duration: $scope.vm.config.duration,
+      duration: vm.config.duration,
       location: newEvent.location,
       startTime: newEvent.startTime.toISO()
     }
-    $scope.vm.loading = true;
+    vm.loading = true;
     service.createAppointment(body)
     .then( () => {
-      $scope.vm.msg = { text: $scope.translate('createsuccess'), type: 'success' };          
-      setTimeout( () => { $scope.vm.msg = null; $scope.$apply(); }, 3000);
-      $scope.hideForm();
+      vm.msg = { text: this.translate('createsuccess'), type: 'success' };          
+      setTimeout( () => { vm.msg = null; $scope.$apply(); }, 3000);
+      this.hideForm();
     })
     .then(() => this.getEvents() )
     .catch( e => {
-      $scope.vm.msg = { text: $scope.translate('createfail') + (e.message || e.statusText), type: 'error' };
-      setTimeout( () => { $scope.vm.msg = null; $scope.$apply(); }, 5000);
+      vm.msg = { text: this.translate('createfail') + (e.message || e.statusText), type: 'error' };
+      setTimeout( () => { vm.msg = null; $scope.$apply(); }, 5000);
     })
-    .finally( () => $scope.vm.loading = false );
+    .finally( () => vm.loading = false );
   }
 
-  $scope.hideForm = () => $scope.vm.showForm = false;
+  this.hideForm = () => vm.showForm = false;
 
-  $scope.clearAlert = () => $scope.vm.msg = null;
+  this.clearAlert = () => vm.msg = null;
 }
 
 AppointmentSchedulerController.$inject = [
