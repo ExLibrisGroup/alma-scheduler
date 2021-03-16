@@ -1,5 +1,5 @@
 # primo-explore-appointment-scheduler
-Adds a widget in Primo account overview screen to allow patrons to manage their appointments made with the [Alma Appointment Scheduler Cloud App](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/).
+Adds a widget in Primo account overview screen to allow patrons to manage their appointments made with the [Alma Appointment Scheduler Cloud App](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/). This add-on is also available in [Primo Studio](http://primo-studio.exlibrisgroup.com).
 
 ## Features
 * View/cancel existing appointments
