@@ -4,6 +4,7 @@ const cors = ( response, event ) => {
   response.headers['Access-Control-Allow-Credentials'] = 'true';
   response.headers['Access-Control-Allow-Headers'] = 'authorization, content-type, x-exl-apikey';
   response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+  response.headers['Access-Control-Max-Age'] = 86400;
   return response;
 }
 

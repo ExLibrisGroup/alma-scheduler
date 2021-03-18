@@ -30,13 +30,15 @@ function AppointmentSchedulerService($http, options) {
         let today = new Date().setUTCHours(0,0,0);
         let appointments = data.data
         .filter(appt=>new Date(appt.startTime) > today)
-        /* Filter out removed locations */
-        .filter(appt=>locations.some(location=>location.id==appt.location))
-        .map(appt=>({
-          id: appt._id,
-          startTime: appt.startTime, 
-          location: locations.find(location=>location.id==appt.location).name
-        }))
+        .map(appt => {
+          let location = locations.find(location=>location.id==appt.location);
+          location = location && location.name || "";
+          return {
+            id: appt._id,
+            startTime: appt.startTime, 
+            location
+          }
+        })
         .sort(sortByStartTime);
         return appointments;
       }),

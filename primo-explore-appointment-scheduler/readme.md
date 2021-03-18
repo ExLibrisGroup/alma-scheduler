@@ -1,9 +1,9 @@
 # primo-explore-appointment-scheduler
-Adds a widget in Primo account overview screen to allow patrons to manage their appointments made with the [Alma Appointment Scheduler Cloud App](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/). This add-on is also available in [Primo Studio](http://primo-studio.exlibrisgroup.com).
+Adds a widget in Primo VE account overview screen to allow patrons to manage their appointments made with the [Alma Appointment Scheduler Cloud App](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/). This add-on is also available in [Primo Studio](http://primo-studio.exlibrisgroup.com).
 
 ## Features
 * View/cancel existing appointments
-* Create new appointmen
+* Create new appointment
 * Cancel existing appointment
 * Works with configuration from the Appointment Scheduler Cloud App
   * List of locations
@@ -13,18 +13,16 @@ Adds a widget in Primo account overview screen to allow patrons to manage their 
 
 ### Screenshots
 ![screenshot](primo-explore-appointment-scheduler-account.png)
-
-Account home page
+_Account home page_
 
 ![screenshot](primo-explore-appointment-scheduler-widget.png)
-
-Widget in new appointment state
+_Widget in new appointment state_
 
 ## Install
 1. Make sure you've installed and configured [primo-explore-devenv](https://github.com/ExLibrisGroup/primo-explore-devenv).
-2. Navigate to your template/central package root directory. For example:
+2. [Download your customization package](https://knowledge.exlibrisgroup.com/Primo/Product_Documentation/020Primo_VE/Primo_VE_\(English\)/050Display_Configuration/010Configuring_Discovery_Views_for_Primo_VE#Branding_Your_View) and navigate to your template/central package root directory. For example:
     ```
-    cd primo-explore/custom/MY_VIEW_ID
+    cd primo-explore/custom/MY_INST_CODE-MY_VIEW_ID
     ```
 3. If you do not already have a `package.json` file in this directory, create one:
     ```
@@ -36,20 +34,16 @@ Widget in new appointment state
     ```
 
 ## Usage
-Once this package is installed, add `appointmentScheduler` as a dependency for your custom module definition.
+It's best to use the `--browserify` build option when using this library. That means placing your customization JavaScript in a separate file such as `main.js`. When building with the `--browserify` option, your code and any dependencies (such as this package) are "minified" and copied into the `custom.js` file which is used by Primo. 
 
-```js
+In the `main.js` file, import the module and then add `appointmentScheduler` as a dependency for your custom module definition.
+```javascript
+import 'primo-explore-appointment-scheduler';
+
 const app = angular.module('viewCustom', ['appointmentScheduler']);
 ```
 
-Note: If you're using the `--browserify` build option, you will need to first import the module with:
-
-```javascript
-import 'primo-explore-appointment-scheduler';
-```
-
-Then add the `appointment-scheduler` component to the `prmAccountOverviewAfter` placeholder as follows:
-
+Add the `appointment-scheduler` component to the `prmAccountOverviewAfter` placeholder as follows:
 ```js
 /** Appointment Scheduler in Library Card */
 app.component('prmAccountOverviewAfter', {
@@ -61,6 +55,18 @@ app.component('prmAccountOverviewAfter', {
 });
 /** END Appointment Scheduler in Library Card */
 ```
+
+Restart your development environment and test the add-on by logging in and navigating to the library card. You should see the Appointment Scheduler add-on.
+```
+gulp run --view MY_INST_CODE-MY_VIEW_ID --ve --browserify
+```
+
+Now you're ready to create your customization package and upload it to your Primo VE view using the View Management screen.
+```
+gulp create-package --browserify
+```
+
+*Note about sandboxes*: Note that the Scheduler Primo Add-on uses the location configuration from the Alma Scheduler Cloud App. The add-on only supports one set of configuration at a time, so if you don't see the locations you expect in the add-on, simply save the configuration in the Cloud App in the desired Alma environment and the locations in the add-on will update accordingly.
 
 ## Configuration
 The following configuration parameters are available:

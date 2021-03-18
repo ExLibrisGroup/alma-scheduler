@@ -1,6 +1,6 @@
 {
   "name": "primo-explore-appointment-scheduler",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Ex Libris Primo New UI add-on for use with the Appointment Scheduler Cloud App",
   "main": "./dist/index.js",
   "scripts": {

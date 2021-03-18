@@ -20,7 +20,7 @@ export const buildSlots = (events, config, newEvent) => {
   }
   /* Get capacity configuration */
   let countOverlapping = 1, currentInterval, nextInterval;
-  const location = newEvent.location; 
+  const { location } = newEvent; 
   const { capacity } = config.locations.find(l=>l.id == location);
   let capacitySlots = [];
   /* Filter events for this location */
