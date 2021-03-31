@@ -66,7 +66,8 @@ Now you're ready to create your customization package and upload it to your Prim
 gulp create-package --browserify
 ```
 
-*Note about sandboxes*: Note that the Scheduler Primo Add-on uses the location configuration from the Alma Scheduler Cloud App. The add-on only supports one set of configuration at a time, so if you don't see the locations you expect in the add-on, simply save the configuration in the Cloud App in the desired Alma environment and the locations in the add-on will update accordingly.
+### Note about sandboxes
+Note that the Scheduler Primo Add-on uses the location configuration from the Alma Scheduler Cloud App. The add-on only supports one set of configuration at a time, so if you don't see the locations you expect in the add-on, simply save the configuration in the Cloud App in the desired Alma environment and the locations in the add-on will update accordingly.
 
 ## Configuration
 The following configuration parameters are available:
