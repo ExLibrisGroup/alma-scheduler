@@ -9,22 +9,41 @@ export const sortByStartTime = (a, b) => {
 export const formatDate = (dt, locale='en') => (DateTime.isDateTime(dt) ? dt : DateTime.fromISO(dt)).setLocale(locale).toLocaleString(DateTime.DATETIME_MED);
 export const formatTime = (dt, locale='en') => (DateTime.isDateTime(dt) ? dt : DateTime.fromISO(dt)).setLocale(locale).toLocaleString(DateTime.TIME_SIMPLE);
 
-export const buildSlots = (events, config, newEvent) => {
+export const buildSlots = (events, config, newEvent, hoursConfig = {}) => {
   const { startHour, endHour, duration } = config;
+  const locationId = newEvent.location; 
+  const { capacity, library } = config.locations.find(l=>l.id == locationId);
   /* Build initial slots */
-  let today = DateTime.fromJSDate(newEvent.startDate).set({hour: startHour, minute: 0, second: 0, millisecond: 0});
   let slots = [];
-  while (today.hour < endHour) {
-    slots.push(today);
-    today = today.plus({minutes: duration})
+  let today = DateTime.fromJSDate(newEvent.startDate).startOf('day');
+  const hours = hoursConfig[library] && hoursConfig[library][today.toISODate()];
+  if (hours) {
+    hours.sort((a, b) => {
+      if(a.from > b.from) return 1;
+      if(a.from < b.from) return -1;
+      return 0;
+    });
+    hours.forEach(h => {
+      today = today.set(timeToDateTime(h.from));
+      const end = today.set(timeToDateTime(h.to))
+      while (today < end) {
+        slots.push(today);
+        today = today.plus({ minutes: duration })
+      }
+    })
+  } else {
+    today = today.set({ hour: startHour });
+    while (today.hour < endHour) {
+      slots.push(today);
+      today = today.plus({ minutes: duration })
+    }
   }
+
   /* Get capacity configuration */
   let countOverlapping = 1, currentInterval, nextInterval;
-  const { location } = newEvent; 
-  const { capacity } = config.locations.find(l=>l.id == location);
   let capacitySlots = [];
   /* Filter events for this location */
-  const eventList = events.filter(e=>e.location == location).sort(sortByStartTime);
+  const eventList = events.filter(e=>e.location == locationId).sort(sortByStartTime);
   /* Loop through events, count events per slot, if exceeds capacity add to list */
   for (const e of eventList) {
     nextInterval = Interval.after(DateTime.fromISO(e.startTime), { minutes: e.duration });
@@ -54,4 +73,9 @@ export const buildSlots = (events, config, newEvent) => {
     c.overlaps(Interval.after(s, {minutes: config.duration}))
   ))
   return slots;
+}
+
+const timeToDateTime = time => {
+  const parts = time.split(':');
+  return { hour: parts[0], minute: parts[1] }
 }

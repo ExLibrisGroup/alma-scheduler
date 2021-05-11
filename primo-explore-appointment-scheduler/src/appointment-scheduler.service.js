@@ -46,6 +46,9 @@ function AppointmentSchedulerService($http, options) {
     getSlots: date => $http.get(options.schedulerApi + `/slots?date=${date}`)
       .then( resp => resp.data ),
 
+    getHours: libCode => $http.get(options.schedulerApi + `/hours/${libCode}`)
+      .then( resp => resp.data ),
+    
     deleteAppointment: id => $http.delete(`${options.schedulerApi}/events/${id}`),
 
     createAppointment: appt => $http.post(options.schedulerApi + '/events', appt)

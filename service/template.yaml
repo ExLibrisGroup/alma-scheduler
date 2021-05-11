@@ -18,6 +18,9 @@ Parameters:
   TwilioFrom:
     Type: String
     Description: From phone number for Twilio
+  ApiKeysSecretName:
+    Type: String
+    Default: AlmaScheduler/ApiKeysSecret
 
 Resources:
   AlmaSchedulerFunction:
@@ -34,6 +37,7 @@ Resources:
           TWILIO_ACCOUNT: !Ref TwilioAccount
           TWILIO_AUTH: !Ref TwilioAuth
           TWILIO_FROM: !Ref TwilioFrom
+          APIKEYS_SECRET: !Ref ApiKeysSecretName
       MemorySize: 1028
       FunctionName: AlmaSchedulerService
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -108,6 +112,21 @@ Resources:
           Properties:
             Path: /patron/config 
             Method: get           
+        SetApiKey:
+          Type: HttpApi
+          Properties:
+            Path: /config/{instCode}/apikey
+            Method: put   
+        GetApiKey:
+          Type: HttpApi
+          Properties:
+            Path: /config/{instCode}/apikey
+            Method: get
+        GetHours:
+          Type: HttpApi
+          Properties:
+            Path: /patron/hours/{libCode}
+            Method: get
   AlmaSchedulerDependencies:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -148,6 +167,20 @@ Resources:
             Action:
             - ses:SendEmail
             Resource: arn:aws:ses:*:*:*
+      - PolicyName: secrets
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - secretsmanager:GetSecretValue
+            - secretsmanager:PutSecretValue
+            Resource: !Ref ApiKeysSecret
+  ApiKeysSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: !Ref ApiKeysSecretName
+      SecretString: '{}'
 
 Outputs:
   AlmaSchedulerApi:

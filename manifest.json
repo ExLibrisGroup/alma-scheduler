@@ -1,9 +1,9 @@
 {
    "id": "exlibrisgroup/alma-scheduler",
    "title": "Appointment Scheduler",
-   "description": "Define locations and schedule appointments for Alma users. Configuration supports hours and duration and multiple locations with capacity. Sends email to users when events are created. Note: This app is currently available in beta form.",
-   "author": "Ex Libris",
    "subtitle": "Schedule appointments for users at defined locations",
+   "author": "Ex Libris",
+   "description": "Define locations and schedule appointments for Alma users. Configuration supports hours and duration and multiple locations with capacity. Sends email to users when events are created. Note: This app is currently available in beta form.",
    "license": "https://raw.githubusercontent.com/exlibrisgroup/alma-scheduler/master/LICENSE",
    "icon": {
       "type": "font",
@@ -19,10 +19,12 @@
    },
    "contentSecurity": {
       "connectSrc": [
-         "https://api-eu.exldevnetwork.net"
+         "https://api-eu.exldevnetwork.net",
+         "http://localhost:3000"
       ],
       "sandbox": {
-         "modals": true
+         "modals": true,
+         "popups": true
       }
    }
 }

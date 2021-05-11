@@ -28,6 +28,7 @@ export class Location {
   name: string = 'Location';
   capacity: number = 1;
   replyTo: string = '';
+  library: string = ''; 
 }
 
 export interface Color {

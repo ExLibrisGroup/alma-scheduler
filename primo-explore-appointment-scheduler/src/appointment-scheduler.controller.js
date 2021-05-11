@@ -14,16 +14,19 @@ class AppointmentSchedulerController {
   };
   locale = this.parentCtrl.$stateParams.lang;
   minDate = new Date();
+  maxDate = DateTime.fromJSDate(this.minDate).plus({ days: 90 }).toJSDate();
   loading = false;
   msg = null;
   config = null;
   appointments = [];
+  hours = {};
   slots = [];
   showForm = false;
 
-  constructor($scope, $attrs, options, service) {
+  constructor($scope, $attrs, $mdDateLocale, options, service) {
     this.$scope = $scope;
     this.$attrs = $attrs;
+    this.$mdDateLocale = $mdDateLocale;
     this.options = options;
     this.service = service;
   }
@@ -35,6 +38,7 @@ class AppointmentSchedulerController {
     /* Set apikey, $attrs can be a Primo Studio config array or the attrs hash */
     const attrs = Array.isArray(this.$attrs) ? this.$attrs[0] : this.$attrs;
     this.options.apikey = attrs.apikey;
+    this.$mdDateLocale.firstDayOfWeek = attrs.firstdayofweek || 0;
 
     /* Load config and events */
     this.loading = true;
@@ -45,6 +49,7 @@ class AppointmentSchedulerController {
         else
           this.config = data;
       })
+      .then(() => this.getHours())
       .then(() => this.getEvents())
       .catch(e => {
         this.msg = { text: this.translate('serviceerror'), type: 'error' };
@@ -54,19 +59,34 @@ class AppointmentSchedulerController {
   };
 
   getEvents() {
-    this.service.getEvents(this.config && this.config.locations)
+    return this.service.getEvents(this.config && this.config.locations)
       .then(appointments => this.appointments = appointments);
   };
 
+  dateOpen = (dt) => {
+    dt = DateTime.fromJSDate(dt).toISODate();
+    const location = this.config.locations.find(l => l.id == this.newEvent.location);
+    const hours = location && location.library && this.hours[location.library];
+    if (!hours || !hours[dt]) return true;
+    return hours[dt].length > 0;
+  }
+
+  getHours() {
+    const queries = this.config.locations.filter(l => l.library)
+    .map(l => this.service.getHours(l.library).then(data => {
+      this.hours[l.library] = data;
+    }));
+    return Promise.all(queries);
+  }
+
   translate(key) {
-    return this.mergedi18n[this.locale] && this.mergedi18n[this.locale][key] ||
-    this.mergedi18n[DEFAULT_LOCALE][key] ||
-    key;
+    return this.mergedi18n[this.locale] && this.mergedi18n[this.locale][key]
+    || this.mergedi18n[DEFAULT_LOCALE][key]
+    || key;
   }
 
   cancel(id) {
-    if (!confirm(this.translate('cancelconfirm')))
-      return;
+    if (!confirm(this.translate('cancelconfirm'))) return;
     this.loading = true;
     this.service.deleteAppointment(id)
       .then(() => {
@@ -88,7 +108,7 @@ class AppointmentSchedulerController {
       this.service.getSlots(dt)
         .then(data => {
           const events = data.filter(e => e.location == this.newEvent.location);
-          this.slots = buildSlots(events, this.config, this.newEvent);
+          this.slots = buildSlots(events, this.config, this.newEvent, this.hours);
           this.newEvent.startTime = null;
         });
     }
@@ -126,7 +146,7 @@ class AppointmentSchedulerController {
 }
 
 AppointmentSchedulerController.$inject = [
-  '$scope', '$attrs', 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
+  '$scope', '$attrs', '$mdDateLocale', 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
 ];
 
 export default AppointmentSchedulerController;

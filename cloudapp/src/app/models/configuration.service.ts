@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Configuration } from './configuration';
-import { CloudAppConfigService, InitData, CloudAppEventsService } from '@exlibris/exl-cloudapp-angular-lib'
+import { CloudAppConfigService, InitData, CloudAppEventsService, CloudAppRestService } from '@exlibris/exl-cloudapp-angular-lib'
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -12,36 +12,33 @@ export class ConfigurationService {
 
   constructor( 
     private configService: CloudAppConfigService,
-    private eventsService: CloudAppEventsService
+    private eventsService: CloudAppEventsService,
   ) { }
   
   async getConfig() {
-    if (this._config) {
-      return this._config;
-    }
-    let config =  await this.configService.get().toPromise()
-    this._config = Object.keys(config).length == 0 
+    if (!this._config) {
+      let config =  await this.configService.get().toPromise()
+      this._config = Object.keys(config).length == 0 
         ? new Configuration()
-        : config
+        : config;
+    }
     return this._config;
   }
 
   async getInitData() {
-    if (this._initData) {
-      return this._initData;
+    if (!this._initData) {
+      this._initData = await this.eventsService.getInitData().toPromise();
     }
-    this._initData = await this.eventsService.getInitData().toPromise();
     return this._initData;
   }
 
   async getToken() {
-    if (this._token) {
-      return this._token;
-    }
-    try {
-      this._token = await this.eventsService.getAuthToken().toPromise();
-    } catch {
-      this._token = '';
+    if (!this._token) {
+      try {
+        this._token = await this.eventsService.getAuthToken().toPromise();
+      } catch {
+        this._token = '';
+      }
     }
     return this._token;
   }

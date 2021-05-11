@@ -1,10 +1,12 @@
 const utils = require('./utils');
+const { success, notfound, error, unauthorized, nocontent } = require('./responses');
 const { auth, authPrimo } = require('./authorizer');
 require('dotenv').config();
 const MONGODB_URI = process.env.MONGODB_URI;
 const validateInstCode = process.env.VALIDATE_INST_CODE != 'false';
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
+const { setApikey, getApikey } = require('./apikeys');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'eu-central-1'});
 
@@ -19,22 +21,21 @@ const handler = async (event, context) => {
   instCode = event.pathParameters && event.pathParameters.instCode;
   userId = event.queryStringParameters && event.queryStringParameters.userId;
   if (event.requestContext && event.requestContext.http.method == 'OPTIONS') {
-    result = { statusCode: 204 };
-    return utils.cors(result, event);
+    return nocontent().cors(event);
   }
   /* Validate token */
   let token;
   if (event.routeKey.indexOf('/patron') >= 0) {
     /* Patron - use Primo VE JWT */
     token = await authPrimo(event.headers.authorization, event.headers['x-exl-apikey']);
-    if (!token) return utils.cors(utils.responses.unauthorized(), event);
+    if (!token) return unauthorized().cors(event);
     instCode = token.institution;
     userId = token.userName;
     ({ displayName } = token);
   } else {
     token = await auth(event.headers.authorization);
     if (!token || (instCode && validateInstCode && instCode != token.inst_code)) {
-      return utils.cors(utils.responses.unauthorized(), event);
+      return unauthorized().cors(event);
     }
   }
 
@@ -48,56 +49,70 @@ const handler = async (event, context) => {
     const date = event.queryStringParameters && event.queryStringParameters.date; 
     switch (event.routeKey) {
       case 'GET /events/{instCode}':
-        result = utils.responses.success(await getEvents(date, userId));
+        result = success(await getEvents(date, userId));
         break;
       case 'POST /events/{instCode}':
-        result = utils.responses.success(await addEvent(body))
+        result = success(await addEvent(body))
         break;
       case 'PUT /events/{instCode}/{id}':
-        result = utils.responses.success(await updateEvent(event.pathParameters.id, body));
+        result = success(await updateEvent(event.pathParameters.id, body));
         break;
       case 'DELETE /events/{instCode}/{id}': 
-        result = utils.responses.success(await deleteEvent(event.pathParameters.id));
+        result = success(await deleteEvent(event.pathParameters.id));
         break;
       case 'GET /events/{instCode}/{id}':
-        result = utils.responses.success(await getEvent(event.pathParameters.id));
+        result = success(await getEvent(event.pathParameters.id));
         break;
       case 'GET /patron/events': 
-        result = utils.responses.success(await getEvents(date, userId));
+        result = success(await getEvents(date, userId));
         break;
       case 'POST /patron/events':
         Object.assign(body, { userId, title: `${displayName} (${userId})`});
-        result = utils.responses.success(await addEvent(body));
+        result = success(await addEvent(body));
         break;
       case 'DELETE /patron/events/{id}': 
         const checkEvent = await getEvent(event.pathParameters.id);
-        if (checkEvent.userId != userId) result = utils.responses.unauthorized();
-        else result = utils.responses.success(await deleteEvent(event.pathParameters.id));
+        if (checkEvent.userId != userId) result = unauthorized();
+        else result = success(await deleteEvent(event.pathParameters.id));
         break;      
       case 'GET /patron/slots':
-        if (!date) result = utils.responses.error('Date required');
-        else result = utils.responses.success(await getSlots(date));
+        if (!date) result = error('Date required');
+        else result = success(await getSlots(date));
         break;
       case 'POST /notifications/email':
-        result = utils.responses.success(await sendNotification(body));
+        result = success(await sendNotification(body));
         break;
       case 'POST /notifications/sms':
-        result = utils.responses.success(await sendSMSNotification(body));
+        result = success(await sendSMSNotification(body));
         break; 
       case 'PUT /config/{instCode}':
-        result = utils.responses.success(await updateConfig(instCode, body));
+        result = success(await updateConfig(instCode, body));
         break;
       case 'GET /patron/config':
-        result = utils.responses.success(await getConfig(instCode));
+        result = success(await getConfig(instCode));
+        break; 
+      case 'PUT /config/{instCode}/apikey':
+        result = success(await setApikey(instCode, body.apikey));
+        break;
+      case 'GET /config/{instCode}/apikey':
+        let apikey = await getApikey(instCode);
+        const re = new RegExp(`^.{1,${apikey.length-5}}`,"g");
+        apikey = apikey.replace(re, m => "*".repeat(m.length))
+        result = success(apikey);
+        break;
+      case 'GET /patron/hours/{libCode}':
+        const libCode = event.pathParameters && event.pathParameters.libCode;
+        result = success(await getHours(instCode, libCode))
+                  .setHeader('Cache-Control', `max-age=${60*60}`);
         break; 
       default:
-        result = utils.responses.notfound();
+        result = notfound();
     }
   } catch (e) {
     console.error('error', e);
-    result = utils.responses.error(e.message);
+    result = error(e.message);
   }
-  return utils.cors(result, event);
+  return result.cors(event);
 };
 
 const getEvents = async (date, userId) => {
@@ -178,6 +193,40 @@ const connect = uri => {
     client = connection.db();
     return client;
   });
+}
+
+const getHours = async (instCode, libcode) => {
+  const alma = require('almarestapi-lib');
+  const apikey = await getApikey(instCode);
+  if (!apikey) {
+    console.warn('No api key defined for ', instCode);
+    return [];
+  }
+  alma.setOptions(await getApikey(instCode));
+  const { DateTime } = require("luxon");
+  var now = DateTime.now();
+  const days = 90, chunk = 30;
+  let from, to, requests = [];
+  do {
+    from = to || now;
+    to = from.plus({ days: chunk });
+    requests.push(alma.getp(`/conf/libraries/${libcode}/open-hours?from=${from.toISODate()}&to=${to.toISODate()}`))
+  } while (to < now.plus({ days }))
+  try {
+    const hours = await Promise.all(requests);
+    return Object.fromEntries(
+      hours
+      .map(h => h.day)
+      .flat()
+      .map(h => [ 
+        h.date.substr(0, 10), 
+        h.hour 
+      ])
+    );
+  } catch(e) {
+    console.error('e', e.message);
+    return []
+  }
 }
 
 module.exports = { handler };

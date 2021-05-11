@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule, getTranslateModule, AlertService, AlertModule } from '@exlibris/exl-cloudapp-angular-lib';
+import { MaterialModule, getTranslateModule, AlertModule } from '@exlibris/exl-cloudapp-angular-lib';
+import { AutoCompleteModule } from 'eca-components';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/moment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ import { ConfigurationService } from './models/configuration.service';
 import { EventUtilsService } from './models/event-utils.service';
 import { ErrorComponent } from './splash/error.component';
 import { SplashComponent } from './splash/splash.component';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -64,9 +66,11 @@ export function getCalendarModule() {
       NgxMatTimepickerModule,
       NgxMatDatetimePickerModule,
       NgxMatMomentModule,
-      MomentDateModule
+      MomentDateModule,
+      AutoCompleteModule,
   ],
   providers: [
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'standard' } },
     {
       provide: MAT_DATE_FORMATS,
       useValue: {

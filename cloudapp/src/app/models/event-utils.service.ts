@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders, ɵangular_packages_common_http_http_e } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import moment from 'moment';
 import { Observable, iif, of, forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -26,7 +26,7 @@ export class EventUtilsService {
 
   async init() {
     const initData = await this.configurationService.getInitData();
-    this.instCode = initData['instCode'];
+    this.instCode = initData.instCode;
     this.configuration = await this.configurationService.getConfig();
     this.token = await this.configurationService.getToken();
     this.headers = new HttpHeaders({ 'Authorization': `Bearer ${this.token}` });
@@ -93,6 +93,12 @@ export class EventUtilsService {
   updateConfig = (config: any): Observable<any> => 
     this.http.put<any>(`${environment.service}/config/${this.instCode}`, config, { headers: this.headers });
 
+  updateApikey = (apikey: string): Observable<any> =>
+    this.http.put<any>(`${environment.service}/config/${this.instCode}/apikey`, { apikey }, { headers: this.headers });
+
+  retrieveApikey = (): Observable<string> => 
+    this.http.get<string>(`${environment.service}/config/${this.instCode}/apikey`, { headers: this.headers });
+  
   sendNotification = (event: AlmaSchedulerEvent, user: any, message: 'appt' | 'cancel' = 'appt'): Observable<boolean> => {
     let requests = [];
     const notification = this.configuration.notification;
@@ -175,7 +181,7 @@ export class EventUtilsService {
 }
 
 const formatDate = (dt: Date, locale: string) => {
-  const options = {
+  const options: Intl.DateTimeFormatOptions = {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     hour: 'numeric', minute: 'numeric'
   };

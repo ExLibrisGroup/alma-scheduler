@@ -12,7 +12,7 @@
   <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 <form *ngIf="form" [formGroup]="form">
-  <mat-tab-group mat-align-tabs="start">
+  <mat-tab-group mat-align-tabs="start" backgroundColor="accent">
     <mat-tab label="Locations">
       <mat-card *ngFor="let location of locations.controls; index as i">
         <mat-card-title>{{location.value.name}}
@@ -21,15 +21,15 @@
           </button>  
         </mat-card-title>
         <mat-card-content>
-          <mat-form-field appearance="standard" class="full-width">
+          <mat-form-field class="full-width">
             <mat-label>Name</mat-label>
             <input matInput type="text" [formControl]="location.controls.name" >
           </mat-form-field>
-          <mat-form-field appearance="standard">
+          <mat-form-field>
             <mat-label>Capacity</mat-label>
             <input matInput type="number" [formControl]="location.controls.capacity" >
           </mat-form-field>
-          <mat-form-field appearance="standard">
+          <mat-form-field>
             <mat-label>Color</mat-label>
             <mat-select [formControl]="location.controls.color">
               <mat-select-trigger>
@@ -40,7 +40,7 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field appearance="standard" class="full-width">
+          <mat-form-field class="full-width">
             <mat-label>Reply-To Address</mat-label>
             <input matInput type="email" [formControl]="location.controls.replyTo" 
               placeholder="Ex. reply@example.com">
@@ -48,6 +48,12 @@
               Please enter a valid email address
             </mat-error>              
           </mat-form-field>
+          <eca-auto-complete
+            [data]='getLibraries'
+            id='libraries'
+            [control]="location.controls.library"
+            label="Library for opening hours"
+          ></eca-auto-complete>
         </mat-card-content>
       </mat-card>      
       <button mat-button mat-stroked-button aria-label="Add" (click)="addLocation()">
@@ -57,15 +63,15 @@
     <mat-tab label="Notification">
       <mat-checkbox class="full-width" labelPosition="after" [formControl]="notification.controls.active">Send email notification</mat-checkbox>
       <mat-checkbox class="full-width" labelPosition="after" [formControl]="notification.controls.sms">Send SMS notification</mat-checkbox>
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>Subject</mat-label>
         <input matInput type="text" [formControl]="notification.controls.subject" [readonly]="!notificationActive">
       </mat-form-field>
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>From name</mat-label>
         <input matInput type="text" [formControl]="notification.controls.from" [readonly]="!notificationActive">
       </mat-form-field>
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>Reply-To Address</mat-label>
         <input matInput type="email" [formControl]="notification.controls.replyTo" [readonly]="!notificationActive"
           placeholder="Ex. reply@example.com">     
@@ -73,45 +79,63 @@
           Please enter a valid email address
         </mat-error>          
       </mat-form-field>            
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>Date Format (language code)</mat-label>
         <input matInput type="text" [formControl]="notification.controls.dateFormat" [readonly]="!notificationActive">
       </mat-form-field>             
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>Default Country Code</mat-label>
         <input matInput type="text" [formControl]="notification.controls.countryCode" [readonly]="!notificationActive">
       </mat-form-field>     
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>Body</mat-label>
         <textarea matInput rows=10 type="text" [formControl]="notification.controls.body" [readonly]="!notificationActive"></textarea>
         <mat-hint>The following replacement fields are available: startTime, location</mat-hint>
       </mat-form-field>
-      <mat-form-field appearance="standard" class="full-width">
+      <mat-form-field class="full-width">
         <mat-label>Cancellation Body</mat-label>
         <textarea matInput rows=10 type="text" [formControl]="notification.controls.cancelBody" [readonly]="!notificationActive"></textarea>
         <mat-hint>The following replacement fields are available: startTime, location</mat-hint>
       </mat-form-field>      
     </mat-tab>
     <mat-tab label="General">
-      <mat-form-field appearance="standard">
+      <mat-form-field>
         <mat-label>Default duration</mat-label>
         <mat-select formControlName="duration">
           <mat-option *ngFor="let min of [5,10,15,20,30,60,120,180,300,480]" [value]="min">{{formatTime(min)}}</mat-option>
         </mat-select>     
       </mat-form-field>
-      <mat-form-field appearance="standard">
+      <mat-form-field>
         <mat-label>Start Hour</mat-label>
         <mat-select formControlName="startHour">
           <mat-option *ngFor="let val of [].constructor(24); index as i" [value]="i">{{i}}:00</mat-option>
         </mat-select>     
       </mat-form-field>
-      <mat-form-field appearance="standard">
+      <mat-form-field>
         <mat-label>End Hour</mat-label>
         <mat-select formControlName="endHour">
           <mat-option *ngFor="let val of [].constructor(24); index as i" [value]="i">{{i}}:00</mat-option>
         </mat-select>     
-      </mat-form-field>            
-    </mat-tab>    
+      </mat-form-field>   
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Primo Add-on</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Use this section to configure the Alma Scheduler <a href="https://github.com/ExLibrisGroup/alma-scheduler/tree/master/primo-explore-appointment-scheduler" target=_blank>Primo Addon</a>.</p>
+          <mat-form-field appearance="standard" class="full-width">
+            <mat-label>API Key for Library Hours</mat-label>
+            <input matInput type="" [(ngModel)]="apikey" [ngModelOptions]="{standalone: true}">
+            <mat-hint>Enter an <a href="https://developers.exlibrisgroup.com/alma/apis/" target=_blank>API key</a> configured for read-only access to the configuration area.</mat-hint>
+          </mat-form-field>
+          <div class="eca-actions">
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button type="button" [disabled]="!apikey || apikey.startsWith('*')" color="primary" (click)="saveApikey()">Save API Key</button>
+        </mat-card-actions>
+      </mat-card>               
+    </mat-tab>   
   </mat-tab-group>
   <hr/>
   <!--<pre>{{form.value | json }}</pre>-->

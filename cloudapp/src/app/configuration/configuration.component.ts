@@ -6,7 +6,8 @@ import { configFormGroup, locationFormGroup, Colors } from '../models/configurat
 import { ConfigurationService } from '../models/configuration.service';
 import { formatTime } from '../models/utils';
 import { EventUtilsService } from '../models/event-utils.service';
-import { switchMap } from 'rxjs/operators';
+import { finalize, switchMap } from 'rxjs/operators';
+import { GetAllOptionsSettings } from 'eca-components';
 
 @Component({
   selector: 'app-configuration',
@@ -19,6 +20,11 @@ export class ConfigurationComponent implements OnInit {
   Colors = Colors;
   saving = false;
   formatTime = formatTime;
+  apikey: string;
+  getLibraries: GetAllOptionsSettings = {
+    request: '/conf/libraries',
+    value: i => i.code
+  }
 
   constructor(
     private alert: AlertService,
@@ -32,6 +38,8 @@ export class ConfigurationComponent implements OnInit {
 
   async load() {
    this.form = configFormGroup(await this.configurationService.getConfig());
+   await this.eventUtils.init();
+   this.getApikey();
   }
 
   save() {
@@ -77,6 +85,26 @@ export class ConfigurationComponent implements OnInit {
   deleteLocation(i) {
     this.locations.removeAt(i);
     this.form.markAsDirty();
+  }
+
+  getApikey() {
+    this.saving = true;
+    this.eventUtils.retrieveApikey()
+    .pipe(finalize(() => this.saving = false))
+    .subscribe(
+      result => this.apikey = result,
+      e => this.alert.error('Error occurred retrieving API key: ' + e.message),
+    )
+  }
+
+  saveApikey() {
+    this.saving = true;
+    this.eventUtils.updateApikey(this.apikey)
+    .pipe(finalize(() => this.saving = false))
+    .subscribe(
+      () => this.alert.success('API Key saved successfully'),
+      e => this.alert.error('Error occurred saving API key: ' + e.message),
+    )
   }
 
   get notification() {
