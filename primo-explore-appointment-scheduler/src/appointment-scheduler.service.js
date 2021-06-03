@@ -4,13 +4,14 @@ function AppointmentSchedulerHttpInterceptor($httpProvider, options) {
   $httpProvider.interceptors.push(function () {
     return {
       request: function (req) {
+        req.params = req.params || {};
         if (req.url.startsWith(options.schedulerApi)) {
           /* Get token from sessionStorage */
           let token = sessionStorage.getItem('primoExploreJwt');
           /* Sometimes token is surrounded by quotes */
           token = token && token.replace(/"/g, "");
           req.headers.Authorization = `Bearer ${token}`;
-          if (options.apikey) req.headers['X-Exl-Apikey'] = options.apikey;
+          if (!!options.sandbox) req.params.sandbox = 'true';
         }
         return req;
       }

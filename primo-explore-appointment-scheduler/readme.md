@@ -50,7 +50,6 @@ app.component('prmAccountOverviewAfter', {
   bindings: {parentCtrl: '<'},
   template: `<appointment-scheduler 
     parent-ctrl="$ctrl.parentCtrl"
-    apikey="l8xx..."
   ></appointment-scheduler>`
 });
 /** END Appointment Scheduler in Library Card */
@@ -73,7 +72,8 @@ Note that the Scheduler Primo Add-on uses the location configuration from the Al
 The following configuration parameters are available:
 | Parameter | Description |
 | --- | --- |
-| apikey | An [API key](https://developers.exlibrisgroup.com/primo/apis/) which is configured for read-only on the **Primo Public Key API only**. (This is important as the key will be exposed in the HTML). The key is used to validate the authorization token.   |
+| sandbox | Set to `true` if using the sandbox Primo. Used for validating user token. Optional. |
+| first-day-of-week | Set the first day of week for the calendar display. 0 for Sunday, 1 for Monday. Default: 0 |
 | i18n |  Overrides for the strings used in the display. The list of string is available [here](https://github.com/ExLibrisGroup/alma-scheduler/blob/master/primo-explore-appointment-scheduler/src/i18n.js). Any string not provided will fall-back to the default. Strings can be provided in different Primo locales (i.e. en, fr). <br>Example:<br><pre>i18n='{<br>  en: {<br>    appointments: "Library Appointments"<br>  },<br>  fr: {<br>    appointments: "Rendez-vous à la bibliothèque"<br>  }<br>}'</pre>|
 
 ## Development
