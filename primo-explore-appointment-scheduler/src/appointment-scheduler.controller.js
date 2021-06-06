@@ -21,10 +21,11 @@ class AppointmentSchedulerController {
   slots = [];
   showForm = false;
 
-  constructor($scope, $attrs, $mdDateLocale, options, service) {
+  constructor($scope, $attrs, $mdDateLocale, studioConfig, options, service) {
     this.$scope = $scope;
     this.$attrs = $attrs;
     this.$mdDateLocale = $mdDateLocale;
+    this.studioConfig = studioConfig;
     this.options = options;
     this.service = service;
   }
@@ -33,8 +34,9 @@ class AppointmentSchedulerController {
     /* Merge i18n with provided strings */
     this.mergedi18n = merge(i18n, this.i18n);
 
-    /* Set apikey, $attrs can be a Primo Studio config array or the attrs hash */
-    const attrs = Array.isArray(this.$attrs) ? this.$attrs[0] : this.$attrs;
+    /* Use $attrs hash or Primo Studio config array */
+    console.log('studioConfig', this.studioConfig)
+    const attrs = Array.isArray(this.studioConfig) ? this.studioConfig[0] : this.$attrs;
     this.options.sandbox = attrs.sandbox;
     this.$mdDateLocale.firstDayOfWeek = parseInt(attrs.firstDayOfWeek) || 0;
 
@@ -128,7 +130,7 @@ class AppointmentSchedulerController {
 }
 
 AppointmentSchedulerController.$inject = [
-  '$scope', '$attrs', '$mdDateLocale', 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
+  '$scope', '$attrs', '$mdDateLocale', 'primoStudioAppointmentSchedulerStudioConfig', 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
 ];
 
 export default AppointmentSchedulerController;

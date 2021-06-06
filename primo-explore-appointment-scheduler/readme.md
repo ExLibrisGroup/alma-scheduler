@@ -1,4 +1,4 @@
-# primo-explore-appointment-scheduler
+# primo-studio-appointment-scheduler
 Adds a widget in Primo VE account overview screen to allow patrons to manage their appointments made with the [Alma Appointment Scheduler Cloud App](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/). This add-on is also available in [Primo Studio](http://primo-studio.exlibrisgroup.com).
 
 ## Features
@@ -38,19 +38,19 @@ It's best to use the `--browserify` build option when using this library. That m
 
 In the `main.js` file, import the module and then add `appointmentScheduler` as a dependency for your custom module definition.
 ```javascript
-import 'primo-explore-appointment-scheduler';
+import 'primo-studio-appointment-scheduler';
 
 const app = angular.module('viewCustom', ['appointmentScheduler']);
 ```
 
-Add the `appointment-scheduler` component to the `prmAccountOverviewAfter` placeholder as follows:
+Add the `primo-strudio-appointment-scheduler` component to the `prmAccountOverviewAfter` placeholder as follows:
 ```js
 /** Appointment Scheduler in Library Card */
 app.component('prmAccountOverviewAfter', {
   bindings: {parentCtrl: '<'},
-  template: `<appointment-scheduler 
+  template: `<primo-studio-appointment-scheduler 
     parent-ctrl="$ctrl.parentCtrl"
-  ></appointment-scheduler>`
+  ></primo-studio-appointment-scheduler>`
 });
 /** END Appointment Scheduler in Library Card */
 ```
@@ -67,6 +67,8 @@ gulp create-package --browserify
 
 ### Note about sandboxes
 Note that the Scheduler Primo Add-on uses the location configuration from the Alma Scheduler Cloud App. The add-on only supports one set of configuration at a time, so if you don't see the locations you expect in the add-on, simply save the configuration in the Cloud App in the desired Alma environment and the locations in the add-on will update accordingly.
+
+To tell the service to validate the logged-in user's token against the sandbox instance, set the `sandbox` configuration property to `true`. See [below](#configuration).
 
 ## Configuration
 The following configuration parameters are available:
