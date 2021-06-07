@@ -78,6 +78,14 @@ The following configuration parameters are available:
 | first-day-of-week | Set the first day of week for the calendar display. 0 for Sunday, 1 for Monday. Default: 0 |
 | i18n |  Overrides for the strings used in the display. The list of string is available [here](https://github.com/ExLibrisGroup/alma-scheduler/blob/master/primo/src/i18n.js). Any string not provided will fall-back to the default. Strings can be provided in different Primo locales (i.e. en, fr). <br>Example:<br><pre>i18n='{<br>  en: {<br>    appointments: "Library Appointments"<br>  },<br>  fr: {<br>    appointments: "Rendez-vous à la bibliothèque"<br>  }<br>}'</pre>|
 
+## Upgrading
+
+### To 0.1.0
+* The package name has changed from `primo-explore-appointment-scheduler` to `primo-studio-appointment-scheduler`
+* The name of the component has changed from `appointment-schduler` to `primo-studio-appointment-scheduler`
+* The `apikey` parameter is no longer needed
+* Two new options parameters are now available: `first-day-of-week` and `sandbox`
+
 ## Development
 To build this add-on, use:
 ```
