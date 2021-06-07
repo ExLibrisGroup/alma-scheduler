@@ -34,4 +34,12 @@ const fixEvent = event => {
   });
 }
 
-module.exports = { cors, responses, fixEvent };
+const toDate = date => {
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
+}
+
+module.exports = { cors, responses, fixEvent, toDate };

@@ -1,14 +1,13 @@
 {
-  "name": "primo-explore-appointment-scheduler",
-  "version": "0.0.12",
+  "name": "primo-studio-appointment-scheduler",
+  "version": "0.1.0",
   "description": "Ex Libris Primo New UI add-on for use with the Appointment Scheduler Cloud App",
-  "main": "./dist/index.js",
   "scripts": {
-    "build": "webpack --mode=production",
-    "buildall": "npm run build && cd ../primo-studio-appointment-scheduler && npm run build"
+    "build": "node version.js && webpack --mode=production"
   },
   "keywords": [
-    "primo-explore"
+    "primo-explore",
+    "primo-studio"
   ],
   "author": "Josh Weisman",
   "license": "BSD-3-Clause",
@@ -17,6 +16,7 @@
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.12.13",
     "babel-loader": "^8.2.2",
+    "copy-pkg-json-webpack-plugin": "0.0.40",
     "css-loader": "^5.0.2",
     "html-loader": "^1.3.2",
     "lodash": "^4.17.20",
@@ -26,10 +26,10 @@
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   },
-  "homepage": "https://github.com/exlibrisgroup/alma-scheduler/tree/master/primo-explore-appointment-scheduler#readme",
+  "homepage": "https://github.com/exlibrisgroup/alma-scheduler/tree/master/primo#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/exlibrisgroup/alma-scheduler",
-    "directory": "primo-explore-appointment-scheduler"
+    "directory": "primo"
   }
 }

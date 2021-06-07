@@ -1,4 +1,4 @@
-# primo-explore-appointment-scheduler
+# primo-studio-appointment-scheduler
 Adds a widget in Primo VE account overview screen to allow patrons to manage their appointments made with the [Alma Appointment Scheduler Cloud App](https://developers.exlibrisgroup.com/appcenter/appointment-scheduler/). This add-on is also available in [Primo Studio](http://primo-studio.exlibrisgroup.com).
 
 ## Features
@@ -38,20 +38,19 @@ It's best to use the `--browserify` build option when using this library. That m
 
 In the `main.js` file, import the module and then add `appointmentScheduler` as a dependency for your custom module definition.
 ```javascript
-import 'primo-explore-appointment-scheduler';
+import 'primo-studio-appointment-scheduler';
 
 const app = angular.module('viewCustom', ['appointmentScheduler']);
 ```
 
-Add the `appointment-scheduler` component to the `prmAccountOverviewAfter` placeholder as follows:
+Add the `primo-strudio-appointment-scheduler` component to the `prmAccountOverviewAfter` placeholder as follows:
 ```js
 /** Appointment Scheduler in Library Card */
 app.component('prmAccountOverviewAfter', {
   bindings: {parentCtrl: '<'},
-  template: `<appointment-scheduler 
+  template: `<primo-studio-appointment-scheduler 
     parent-ctrl="$ctrl.parentCtrl"
-    apikey="l8xx..."
-  ></appointment-scheduler>`
+  ></primo-studio-appointment-scheduler>`
 });
 /** END Appointment Scheduler in Library Card */
 ```
@@ -69,12 +68,15 @@ gulp create-package --browserify
 ### Note about sandboxes
 Note that the Scheduler Primo Add-on uses the location configuration from the Alma Scheduler Cloud App. The add-on only supports one set of configuration at a time, so if you don't see the locations you expect in the add-on, simply save the configuration in the Cloud App in the desired Alma environment and the locations in the add-on will update accordingly.
 
+To tell the service to validate the logged-in user's token against the sandbox instance, set the `sandbox` configuration property to `true`. See [below](#configuration).
+
 ## Configuration
 The following configuration parameters are available:
 | Parameter | Description |
 | --- | --- |
-| apikey | An [API key](https://developers.exlibrisgroup.com/primo/apis/) which is configured for read-only on the **Primo Public Key API only**. (This is important as the key will be exposed in the HTML). The key is used to validate the authorization token.   |
-| i18n |  Overrides for the strings used in the display. The list of string is available [here](https://github.com/ExLibrisGroup/alma-scheduler/blob/master/primo-explore-appointment-scheduler/src/i18n.js). Any string not provided will fall-back to the default. Strings can be provided in different Primo locales (i.e. en, fr). <br>Example:<br><pre>i18n='{<br>  en: {<br>    appointments: "Library Appointments"<br>  },<br>  fr: {<br>    appointments: "Rendez-vous à la bibliothèque"<br>  }<br>}'</pre>|
+| sandbox | Set to `true` if using the sandbox Primo. Used for validating user token. Optional. |
+| first-day-of-week | Set the first day of week for the calendar display. 0 for Sunday, 1 for Monday. Default: 0 |
+| i18n |  Overrides for the strings used in the display. The list of string is available [here](https://github.com/ExLibrisGroup/alma-scheduler/blob/master/primo/src/i18n.js). Any string not provided will fall-back to the default. Strings can be provided in different Primo locales (i.e. en, fr). <br>Example:<br><pre>i18n='{<br>  en: {<br>    appointments: "Library Appointments"<br>  },<br>  fr: {<br>    appointments: "Rendez-vous à la bibliothèque"<br>  }<br>}'</pre>|
 
 ## Development
 To build this add-on, use:
@@ -88,4 +90,4 @@ npm publish
 ```
 
 ## Contributions
-We welcome contributions to this community-supported add-on. We're also happy to add additional default translations to the [string file](https://github.com/ExLibrisGroup/alma-scheduler/blob/master/primo-explore-appointment-scheduler/src/i18n.js).
+We welcome contributions to this community-supported add-on. We're also happy to add additional default translations to the [string file](https://github.com/ExLibrisGroup/alma-scheduler/blob/master/primo/src/i18n.js).

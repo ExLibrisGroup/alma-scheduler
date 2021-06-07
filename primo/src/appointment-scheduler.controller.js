@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import i18n from './i18n';
 import { merge } from 'lodash'
 import { buildSlots } from './utils';
+import { componentName } from './environment';
 
 const DEFAULT_LOCALE = 'en';
 
@@ -21,9 +22,11 @@ class AppointmentSchedulerController {
   slots = [];
   showForm = false;
 
-  constructor($scope, $attrs, options, service) {
+  constructor($scope, $attrs, $mdDateLocale, studioConfig, options, service) {
     this.$scope = $scope;
     this.$attrs = $attrs;
+    this.$mdDateLocale = $mdDateLocale;
+    this.studioConfig = studioConfig;
     this.options = options;
     this.service = service;
   }
@@ -32,9 +35,11 @@ class AppointmentSchedulerController {
     /* Merge i18n with provided strings */
     this.mergedi18n = merge(i18n, this.i18n);
 
-    /* Set apikey, $attrs can be a Primo Studio config array or the attrs hash */
-    const attrs = Array.isArray(this.$attrs) ? this.$attrs[0] : this.$attrs;
-    this.options.apikey = attrs.apikey;
+    /* Use $attrs hash or Primo Studio config array */
+    console.log('studioConfig', this.studioConfig)
+    const attrs = Array.isArray(this.studioConfig) ? this.studioConfig[0] : this.$attrs;
+    this.options.sandbox = attrs.sandbox;
+    this.$mdDateLocale.firstDayOfWeek = parseInt(attrs.firstDayOfWeek) || 0;
 
     /* Load config and events */
     this.loading = true;
@@ -126,7 +131,7 @@ class AppointmentSchedulerController {
 }
 
 AppointmentSchedulerController.$inject = [
-  '$scope', '$attrs', 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
+  '$scope', '$attrs', '$mdDateLocale', `${componentName}StudioConfig`, 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
 ];
 
 export default AppointmentSchedulerController;

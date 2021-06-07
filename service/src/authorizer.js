@@ -26,9 +26,9 @@ module.exports.auth = async header => {
   }
 }
 
-module.exports.authPrimo = async (header, apikey) => {
+module.exports.authPrimo = async (header, sandbox) => {
   try {
-    const getKey = getKeyFunction(apikey);
+    const getKey = getKeyFunction(sandbox ? 'sandbox' : '');
     return await verify(header, getKey);
   } catch(e) {
     console.log('invalid token', e.message);

@@ -26,11 +26,10 @@ const handler = async (event, context) => {
   let token;
   if (event.routeKey.indexOf('/patron') >= 0) {
     /* Patron - use Primo VE JWT */
-    token = await authPrimo(event.headers.authorization, event.headers['x-exl-apikey']);
+    const sandbox = event.queryStringParameters && event.queryStringParameters.sandbox === 'true';
+    token = await authPrimo(event.headers.authorization, sandbox);
     if (!token) return utils.cors(utils.responses.unauthorized(), event);
-    instCode = token.institution;
-    userId = token.userName;
-    ({ displayName } = token);
+    ({ userName: userId, displayName, institution: instCode } = token);
   } else {
     token = await auth(event.headers.authorization);
     if (!token || (instCode && validateInstCode && instCode != token.inst_code)) {
@@ -106,6 +105,9 @@ const getEvents = async (date, userId) => {
     let enddate = new Date(date);
     enddate.setDate(enddate.getDate() + 1);
     query.startTime = { $gt: date, $lt: enddate.toISOString() };
+  } else {
+    /* Get only future events */
+    query.startTime = { $gt: utils.toDate(new Date()).toISOString() };
   }
   if (userId) query.userId = userId;
   return await collection.find(query).toArray();
