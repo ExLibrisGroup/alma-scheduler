@@ -11,7 +11,7 @@ function AppointmentSchedulerHttpInterceptor($httpProvider, options) {
           /* Sometimes token is surrounded by quotes */
           token = token && token.replace(/"/g, "");
           req.headers.Authorization = `Bearer ${token}`;
-          if (!!options.sandbox) req.params.sandbox = 'true';
+          if (!!options.sandbox && options.sandbox !== 'false') req.params.sandbox = 'true';
         }
         return req;
       }

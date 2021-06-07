@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import i18n from './i18n';
 import { merge } from 'lodash'
 import { buildSlots } from './utils';
+import { componentName } from './environment';
 
 const DEFAULT_LOCALE = 'en';
 
@@ -130,7 +131,7 @@ class AppointmentSchedulerController {
 }
 
 AppointmentSchedulerController.$inject = [
-  '$scope', '$attrs', '$mdDateLocale', 'primoStudioAppointmentSchedulerStudioConfig', 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
+  '$scope', '$attrs', '$mdDateLocale', `${componentName}StudioConfig`, 'AppointmentSchedulerOptions', 'AppointmentSchedulerService'
 ];
 
 export default AppointmentSchedulerController;

@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyPkgJsonPlugin = require("copy-pkg-json-webpack-plugin")
+const { componentName } = require('./src/environment');
 
 const config = {
   entry: {
@@ -7,11 +8,14 @@ const config = {
   },
   output: {
     path: path.resolve('./', 'dist/'),
-    filename: 'js/primoStudioAppointmentScheduler.js',
+    filename: `js/${componentName}.js`,
   },
   plugins: [
     new CopyPkgJsonPlugin({
-      remove: ['devDependencies', 'scripts']
+      remove: ['devDependencies', 'scripts'],
+      replace: {
+        main: `./js/${componentName}.js`,
+      } 
     })
   ],
   module: {

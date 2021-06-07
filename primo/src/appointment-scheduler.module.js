@@ -1,11 +1,7 @@
-import { environment } from './environment';
+import { environment, componentName } from './environment';
 import { AppointmentSchedulerHttpInterceptor, AppointmentSchedulerService } from './appointment-scheduler.service';
 import { formatDate, formatTime } from './utils';
 import AppointmentSchedulerComponent from './appointment-scheduler.component';
-import { camelCase } from 'lodash';
-
-const { name } = require('../package.json');
-const componentName = camelCase(name);
 
 export const AppointmentSchedulerModule =  
 angular.module('appointmentScheduler', [])
