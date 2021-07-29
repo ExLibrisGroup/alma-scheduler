@@ -30,7 +30,7 @@ _Widget in new appointment state_
     ```
 4. Install this package:
     ```
-    npm install primo-explore-appointment-scheduler --save-dev
+    npm install primo-studio-appointment-scheduler --save-dev
     ```
 
 ## Usage
