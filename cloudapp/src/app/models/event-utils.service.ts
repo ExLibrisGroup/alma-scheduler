@@ -104,6 +104,8 @@ export class EventUtilsService {
           return formatDate(event.startTime, notification.dateFormat);
         case 'location':
           return location.name;
+        case 'duration':
+          return event.duration.toString();
         default:
           return '';
       }
@@ -175,7 +177,7 @@ export class EventUtilsService {
 }
 
 const formatDate = (dt: Date, locale: string) => {
-  const options = {
+  const options: Intl.DateTimeFormatOptions = {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     hour: 'numeric', minute: 'numeric'
   };
