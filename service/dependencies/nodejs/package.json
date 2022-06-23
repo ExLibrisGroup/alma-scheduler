@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "dotenv": "^8.2.0",
-    "got": "^11.8.1",
+    "got": "^11.8.5",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.5",
     "mongodb": "^3.5.8",
