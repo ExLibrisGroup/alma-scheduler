@@ -23,6 +23,6 @@
     "@angular/material-moment-adapter": "^9.2.4",
     "@fortawesome/fontawesome-free": "^5.13.0",
     "angular-calendar": "^0.28.15",
-    "moment": "^2.26.0"
+    "moment": "^2.29.4"
   }
 }
