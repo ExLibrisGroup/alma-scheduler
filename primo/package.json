@@ -23,8 +23,8 @@
     "luxon": "^1.25.0",
     "sass-loader": "^10.1.1",
     "style-loader": "^2.0.0",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.2.3"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "homepage": "https://github.com/exlibrisgroup/alma-scheduler/tree/master/primo#readme",
   "repository": {
